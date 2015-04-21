@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.11.8)  15 APR 2015 16:19
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.11.8)  15 APR 2015 16:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -512,29 +512,27 @@ Overfull \hbox (2.18398pt too wide) in paragraph at lines 124--125
  []
 
 
-Overfull \hbox (11.79764pt too wide) in paragraph at lines 156--160
+Overfull \hbox (11.79764pt too wide) in paragraph at lines 157--161
 \T1/aer/m/n/9 tem-per-a-ture cooler or warmer out-side ? Does it rain/snow
  []
 
 
-Overfull \hbox (25.05478pt too wide) in paragraph at lines 164--166
+Overfull \hbox (25.05478pt too wide) in paragraph at lines 165--167
 []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 164--166
+Underfull \hbox (badness 10000) in paragraph at lines 165--167
 
  []
 
 [2]
-Overfull \hbox (7.17265pt too wide) in paragraph at lines 186--187
+Overfull \hbox (7.17265pt too wide) in paragraph at lines 187--188
 []\T1/aer/m/n/9 open sun-blinds \T1/aer/bx/n/9 if \T1/aer/m/n/9 sun-blinds clos
 ed $\OMS/cmsy/m/n/9 ^$ \T1/aer/m/n/9 part of the day='day'
  []
 
-[3
-
-] (./report_acm.aux) ) 
+[3] (./report_acm.aux) ) 
 Here is how much of TeX's memory you used:
  2994 strings out of 495028
  37060 string characters out of 6181497
@@ -543,16 +541,16 @@ Here is how much of TeX's memory you used:
  46474 words of font info for 64 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  41i,10n,28p,380b,246s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.en
-c}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr
-/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/share/
-texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/share/texlive/texmf-d
-ist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/share/texlive/texmf-dist/fon
-ts/type1/urw/helvetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw
-/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8
-a.pfb>
-Output written on report_acm.pdf (3 pages, 106448 bytes).
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.
+enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/urw/helvetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
+rw/helvetic/uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utm
+b8a.pfb>
+Output written on report_acm.pdf (3 pages, 106726 bytes).
 PDF statistics:
  47 PDF objects out of 1000 (max. 8388607)
  33 compressed objects within 1 object stream

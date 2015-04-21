@@ -150,7 +150,8 @@ The computer should also be running 24/7 and thus the computer has to have a low
 The sensors fusion is performed to produce a context. A context is the actual state of an entity such as a room or a person. In this report we need to know exactly which kind of contexts we are going to consider to know exactly which sensor data has to be aggregated to produce the actual state of a room for example. Here are the contexts we are going to conside
 \begin{description}
  \item[The lightning state of the room]\hfill \\ 
- Dark or lighted ?
+ Is the room dark or enlighted ? Does the lights are activated ? This information can
+ be infered by using the inside and outside lightning sensors, sunblinds status and the lights status.
  \item[The occupation of the room]\hfill \\ 
  Is the room empty or not. When does the room is usually empty ?
  \item[The actual weather state inside and outside]\hfill \\
@@ -167,7 +168,7 @@ The sensors fusion is performed to produce a context. A context is the actual st
 \textbf{[INSERT HERE WHY THOSE CONTEXTS]}\\
 As this list is now fully established we have to on which sensors to use to analyse the context wanted.
 \begin{itemize}
- \item The lightning state of the room: Lightning sensors + sunblinds status + outside lightning.
+ \item The lightning state of the room: .
  \item The occupation of the room: Presence sensors.
  \item The actual weather state: Regional meteo status available over the internet.
  \item Is a car waiting at the parking doors: RFID reader near the garage doors.
@@ -176,10 +177,10 @@ As this list is now fully established we have to on which sensors to use to anal
 Admit now that each context has been computer via the sensor data. We must now describe how an actual context combined with new sensors data coming in will react. This can be done via listening all the possibilities.
 \begin{description}
  \item[Do] activate lightning \textbf{if} somebody enters the room $\land$ the room is dark.
- \item[Do] deactivate lightning \textbf{if} The room becomes empty $\land$ the room is lightened.
+ \item[Do] deactivate lightning \textbf{if} the room becomes empty $\land$ the room is lightened.
  \item[Do] reduce heating \textbf{if} room is usually empty for a quite long period $\land$ nobody is inside.
- \item[Do] reduce heating \textbf{if} outside temperature > comfort temperature + threshold
- \item[Do] augment heating \textbf{if} temperature < comfort temperature + threshold.
+ \item[Do] reduce heating \textbf{if} outside temperature > comfort temperature $\pm$ threshold
+ \item[Do] augment heating \textbf{if} temperature < comfort temperature $\pm$ threshold.
  \item[Do] open doors \textbf{if} car is at the parking doors $\land$ door closed.
  \item[Do] close the doors \textbf{if} timer for doors is over $\land$ no car at the parking doors.
  \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day!=’day’.
