@@ -180,15 +180,24 @@ POST address_of_sensor
     <CONTENT>'RTS'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
-During the time between two RTS message, sensors are able to aggregate their sensors value to give a mean value of them.
-As the sensors are now synchronize we need to infer context from their data.
+During the time between two RTS messages, sensors are able to aggregate their sensors value to give a mean value of them.
+As the sensors are now synchronized we need to infer contexts from their data.
 \subsubsection{Context inference}
-
+Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
+A certain context may depend on several subcontext or states, 
+e.g. the lightning state of a room may depend of the outsite lightning, the state of the lights of the room and the states of the sunblinds.
 \begin{description}
  \item[The lightning state of the room]\hfill \\ 
- This context is composed of distinct contexts, the lightning of the room and the outside environment [ "dark" | "lighted" ], the sunblind states [ "open" | "closed" ] the states of the lights them selfs [ "on" | "off" ]. 
- Of course those contexts are inferred by using multiple sensors input, e.g. multiple lights implies multiple light states that will be summed.
- 
+ This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblind states \textbf{("open" or "closed")}. 
+ Of course those contexts are inferred by using multiple sensors input, e.g. multiple sunblinds implies multiple sunblinds states that will be summed. But we will not extend the description of such details.
+ The lightning state of the room itself may be described as ("dark" or "natural lightned" or "artificially lightned").
+ \begin{description}
+  \item["dark"] \textbf{if} lightning of the room = "dark"
+  \item["natural lightned"] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "lighted" $\land$ sunblinds = "open".
+  \item["artificially lightned"] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "dark".
+
+ \end{description}
+
  %Is the room dark or enlighted ? Does the lights are activated ? This information can
  %be infered by using the inside and outside lightning sensors, sunblinds status and the lights status.
  \item[The occupation of the room]\hfill \\ 
@@ -206,14 +215,10 @@ As the sensors are now synchronize we need to infer context from their data.
 \end{description}
 \textbf{[INSERT HERE WHY THOSE CONTEXTS]}\\
 As this list is now fully established we have to on which sensors to use to analyse the context wanted.
-\begin{itemize}
- \item The lightning state of the room: .
- \item The occupation of the room: Presence sensors.
- \item The actual weather state: Regional meteo status available over the internet.
- \item Is a car waiting at the parking doors: RFID reader near the garage doors.
- \item What is the actual consumption of the whole building: Energy consumption sensor and water consumption sensor
-\end{itemize}
-Admit now that each context has been computer via the sensor data. We must now describe how an actual context combined with new sensors data coming in will react. This can be done via listening all the possibilities.
+
+Admit now that each context has been computer via the sensor data.
+We must now describe how an actual context combined with new sensors data coming in will react. 
+This can be done via listening all the possibilities.
 \begin{description}
  \item[Do] activate lightning \textbf{if} somebody enters the room $\land$ the room is dark.
  \item[Do] deactivate lightning \textbf{if} the room becomes empty $\land$ the room is lightened.

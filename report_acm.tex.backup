@@ -56,7 +56,7 @@ This structure follows the given standard loop of a pervasive system~\ref{loop}.
 				\begin{figure}[htb]
 				\begin{center}
 				\includegraphics[width=\linewidth]{loop}
-				\caption{Pervasie system loop \label{loop}}
+				\caption{Pervasive system loop \label{loop}}
 				\end{center}
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -167,13 +167,29 @@ Here are the contexts we are going to considered.
 Has some sensors output can be asynchronous, e.g. if we take the presence sensor it could output each time it detect a presence.
 This could be solve by using some kind of synchronization protocol similar to the WiFi communication protocol.
 Each sensor we have is connected to a little computer used for preprocessing of sensor inputs, this allow us to synchronize the data flow by offering time windows management.
-This kind of management is usually done by either give a time frame by sensor or allow one big time frame to allow each sensor to send periodically as a clock tick.
-
+This kind of management is usually done by either give a time frame by sensor or allow one big time frame to allow each sensor to send periodically during a certain amount of time.
+The second option will be taken here but we might introduce a little modification. 
+The size and the exact beginning of this time frame is not fixed but we introduce here Ready-To-Send (RTS) messages similar to Wifi collision avoidance protocol.
+Each time the Central Unit has finished to infer all the contexts it send a message to all the sensors a RTS message to notify them that they can send their data.
+Such a message would look like the following.
+\begin{verbatim}
+POST address_of_sensor 
+  <MESSAGE>
+    <TYPE>event</TYPE>
+    <FROM>central</FROM>
+    <CONTENT>'RTS'</CONTENT/>
+  </MESSAGE> 
+\end{verbatim}
+During the time between two RTS messages, sensors are able to aggregate their sensors value to give a mean value of them.
+As the sensors are now synchronized we need to infer contexts from their data.
+\subsubsection{Context inference}
+Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
+A certain context may depend on several subcontext or states, 
+e.g. the lightning state of a room may depend of the outsite lightning, the state of the lights of the room and the states of the sunblinds.
 \begin{description}
  \item[The lightning state of the room]\hfill \\ 
- This context is composed of distinct contexts, the lightning of the room and the outside environment ["dark"|"lighted"], the sunblind states ["open"|"closed"] the states of the lights them selfs ["on"|"off"]. 
- Of course those contexts are inferred by using multiple sensors input, e.g. multiple lights implies multiple light states that will be summed.
- 
+ This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")}, the sunblind states \textbf{("open" or "closed")} the states of the lights them selfs \textbf{("on" or "off")}. 
+ Of course those contexts are inferred by using multiple sensors input, e.g. multiple lights implies multiple light states that will be summed. But we will not extend the description of such details.
  %Is the room dark or enlighted ? Does the lights are activated ? This information can
  %be infered by using the inside and outside lightning sensors, sunblinds status and the lights status.
  \item[The occupation of the room]\hfill \\ 
@@ -191,14 +207,10 @@ This kind of management is usually done by either give a time frame by sensor or
 \end{description}
 \textbf{[INSERT HERE WHY THOSE CONTEXTS]}\\
 As this list is now fully established we have to on which sensors to use to analyse the context wanted.
-\begin{itemize}
- \item The lightning state of the room: .
- \item The occupation of the room: Presence sensors.
- \item The actual weather state: Regional meteo status available over the internet.
- \item Is a car waiting at the parking doors: RFID reader near the garage doors.
- \item What is the actual consumption of the whole building: Energy consumption sensor and water consumption sensor
-\end{itemize}
-Admit now that each context has been computer via the sensor data. We must now describe how an actual context combined with new sensors data coming in will react. This can be done via listening all the possibilities.
+
+Admit now that each context has been computer via the sensor data.
+We must now describe how an actual context combined with new sensors data coming in will react. 
+This can be done via listening all the possibilities.
 \begin{description}
  \item[Do] activate lightning \textbf{if} somebody enters the room $\land$ the room is dark.
  \item[Do] deactivate lightning \textbf{if} the room becomes empty $\land$ the room is lightened.
