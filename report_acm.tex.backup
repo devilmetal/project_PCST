@@ -56,7 +56,7 @@ This structure follows the given standard loop of a pervasive system~\ref{loop}.
 				\begin{figure}[htb]
 				\begin{center}
 				\includegraphics[width=\linewidth]{loop}
-				\caption{Pervasive system loop \label{loop}}
+				\caption{Pervasie system loop \label{loop}}
 				\end{center}
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -167,26 +167,11 @@ Here are the contexts we are going to considered.
 Has some sensors output can be asynchronous, e.g. if we take the presence sensor it could output each time it detect a presence.
 This could be solve by using some kind of synchronization protocol similar to the WiFi communication protocol.
 Each sensor we have is connected to a little computer used for preprocessing of sensor inputs, this allow us to synchronize the data flow by offering time windows management.
-This kind of management is usually done by either give a time frame by sensor or allow one big time frame to allow each sensor to send periodically during a certain amount of time.
-The second option will be taken here but we might introduce a little modification. 
-The size and the exact beginning of this time frame is not fixed but we introduce here Ready-To-Send (RTS) messages similar to Wifi collision avoidance protocol.
-Each time the Central Unit has finished to infer all the contexts it send a message to all the sensors a RTS message to notify them that they can send their data.
-Such a message would look like the following.
-\begin{verbatim}
-POST address_of_sensor
-  <MESSAGE>
-    <TYPE>event</TYPE>
-    <FROM>central</FROM>
-    <CONTENT>'RTS'</CONTENT/>
-  </MESSAGE> 
-\end{verbatim}
-During the time between two RTS message, sensors are able to aggregate their sensors value to give a mean value of them.
-As the sensors are now synchronize we need to infer context from their data.
-\subsubsection{Context inference}
+This kind of management is usually done by either give a time frame by sensor or allow one big time frame to allow each sensor to send periodically as a clock tick.
 
 \begin{description}
  \item[The lightning state of the room]\hfill \\ 
- This context is composed of distinct contexts, the lightning of the room and the outside environment [ "dark" | "lighted" ], the sunblind states [ "open" | "closed" ] the states of the lights them selfs [ "on" | "off" ]. 
+ This context is composed of distinct contexts, the lightning of the room and the outside environment ["dark"|"lighted"], the sunblind states ["open"|"closed"] the states of the lights them selfs ["on"|"off"]. 
  Of course those contexts are inferred by using multiple sensors input, e.g. multiple lights implies multiple light states that will be summed.
  
  %Is the room dark or enlighted ? Does the lights are activated ? This information can
