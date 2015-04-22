@@ -173,7 +173,7 @@ The size and the exact beginning of this time frame is not fixed but we introduc
 Each time the Central Unit has finished to infer all the contexts it send a message to all the sensors a RTS message to notify them that they can send their data.
 Such a message would look like the following.
 \begin{verbatim}
-POST address_of_sensor
+POST address_of_sensor 
   <MESSAGE>
     <TYPE>event</TYPE>
     <FROM>central</FROM>
