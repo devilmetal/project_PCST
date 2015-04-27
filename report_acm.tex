@@ -113,7 +113,7 @@ Where the TYPE denotes an alert, an event or even a failure for example.
 The FROM and CONTENT parts deals respectively with the author of the message and the actual meaning of the message. 
 A typical proximity sensor message would look like the following :
 \begin{verbatim}
-POST address_of_CentralUnit 
+POST central_unit 
   <MESSAGE>
     <TYPE>event</TYPE>
     <FROM>sensor_id2345</FROM>
@@ -195,13 +195,27 @@ e.g. the lightning state of a room may depend of the outsite lightning, the stat
   \item["dark"] \textbf{if} lightning of the room = "dark"
   \item["natural lightned"] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "lighted" $\land$ sunblinds = "open".
   \item["artificially lightned"] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "dark".
-
  \end{description}
-
+ 
  %Is the room dark or enlighted ? Does the lights are activated ? This information can
  %be infered by using the inside and outside lightning sensors, sunblinds status and the lights status.
  \item[The occupation of the room]\hfill \\ 
- Is the room empty or not. When does the room is usually empty ?
+ In order to determine if the actual occupation of the room (\textbf{"empty" or "occupied"} we need to merge the inputs of the presence sensors of the room.
+ Each presence sensor can determine if something moves around it.
+ \begin{verbatim}
+POST central_unit 
+  <MESSAGE>
+    <TYPE>event</TYPE>
+    <FROM>sensor_id</FROM>
+    <CONTENT>presence:('true'|'false')</CONTENT/>
+  </MESSAGE> 
+\end{verbatim}
+Those sensors inputs are merge to produce a single state of the room.
+\begin{description}
+  \item["occupied"] \textbf{if} $\underset{s \in sensors}{\lor} s_{state} =  True$
+  \item["empty"] \textbf{if} $\underset{s \in sensors}{\lor} s_{state} =  False$
+ \end{description}
+ %Is the room empty or not. When does the room is usually empty ?
  \item[The actual weather state inside and outside]\hfill \\
  (temperature, lightning and precipitations). 
  Is the temperature cold/warm, based on a threshold. Is the temperature cooler or warmer outside ? 
