@@ -192,15 +192,15 @@ e.g. the lightning state of a room may depend of the outsite lightning, the stat
  Of course those contexts are inferred by using multiple sensors input, e.g. multiple sunblinds implies multiple sunblinds states that will be summed. But we will not extend the description of such details.
  The lightning state of the room itself may be described as ("dark" or "natural lightned" or "artificially lightned").
  \begin{description}
-  \item["dark"] \textbf{if} lightning of the room = "dark"
-  \item["natural lightned"] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "lighted" $\land$ sunblinds = "open".
-  \item["artificially lightned"] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "dark".
+  \item[dark] \textbf{if} lightning of the room = "dark"
+  \item[natural lightned] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "lighted" $\land$ sunblinds = "open".
+  \item[artificially lightned] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "dark".
  \end{description}
  
  %Is the room dark or enlighted ? Does the lights are activated ? This information can
  %be infered by using the inside and outside lightning sensors, sunblinds status and the lights status.
  \item[The occupation of the room]\hfill \\ 
- In order to determine if the actual occupation of the room (\textbf{"empty" or "occupied"} we need to merge the inputs of the presence sensors of the room.
+ In order to determine if the actual occupation of the room (\textbf{"empty" or "occupied"}) we need to merge the inputs of the presence sensors of the room.
  Each presence sensor can determine if something moves around it.
  \begin{verbatim}
 POST central_unit 
@@ -211,19 +211,40 @@ POST central_unit
   </MESSAGE> 
 \end{verbatim}
 Those sensors inputs are merge to produce a single state of the room.
-\begin{description}
-  \item["occupied"] \textbf{if} $\underset{s \in sensors}{\lor} s_{state} =  True$
-  \item["empty"] \textbf{if} $\underset{s \in sensors}{\lor} s_{state} =  False$
+If $S$ is the set of sensors used then the state is infered by the following equations.
+ \begin{description}
+  \item[occupied] \textbf{if} $\underset{s \in S}{\lor} s_{state} =  True$
+  \item[empty] \textbf{if} $\underset{s \in S}{\lor} s_{state} =  False$
  \end{description}
- %Is the room empty or not. When does the room is usually empty ?
  \item[The actual weather state inside and outside]\hfill \\
  (temperature, lightning and precipitations). 
- Is the temperature cold/warm, based on a threshold. Is the temperature cooler or warmer outside ? 
- Does it rain/snow outside ? What is the actual lightning ?
- \item[Which is the part of the day ?] \hfill \\
- Look at the actual time => infers moning / evening / midnight / ...
+ This context depends on many different sensors input and merging.
+ The first subcontext to determine how the temperature state outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
+ Those terms are based on a user-determined threshold.
+ Each subcontext can be infered by using data provided on the Internet or by using outside temperature sensors.
+ If $S$ is the set of sensors used outside or inside then the temperature is determined by the following equation.s
+ \begin{description}
+  \item[hot|comfort|cold] \textbf{if} $\frac{\underset{s \in S}{\sum} s_{value}}{|S|} \in [min_{value},max_{value}]$
+ \end{description}
+ The precipitations state (\textbf{"rainy" or "dry"}) be infered by using values retrived over the Internet.
+  \item[Which is the part of the day ?] \hfill \\
+  The actual date and time is enough to infer such an information.
+  The part of the day can be \textbf{"morning", "noon", "afternoon", "evening" or "night"}
  \item[Is a car waiting at the garage doors ?] \hfill \\
-  Look at the RFID reader. Is the car allowed to pass ?
+ If an authorized car approches the RFID reader then the door can be opened.
+ The message send by the RFID reader have the following form.
+  \begin{verbatim}
+  POST central_unit 
+  <MESSAGE>
+    <TYPE>event</TYPE>
+    <FROM>RFID_reader</FROM>
+    <CONTENT>
+      presence:('true'|'false'),
+      car:('allowed','forbidden')
+    </CONTENT/>
+  </MESSAGE> 
+\end{verbatim}
+If a car with a RFID tag approches the RFID reader then the presence field turn to "true". If the tag is authorized then the car field turn to "allowed".
  \item[What is the actual consumption of the whole building ?]\hfill \\
  May be used to display to the webinterface.
 \end{description}
@@ -241,8 +262,8 @@ This can be done via listening all the possibilities.
  \item[Do] augment heating \textbf{if} temperature < comfort temperature $\pm$ threshold.
  \item[Do] open doors \textbf{if} car is at the parking doors $\land$ door closed.
  \item[Do] close the doors \textbf{if} timer for doors is over $\land$ no car at the parking doors.
- \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day!=’day’.
- \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day=’day’ $\land$ someone enters the room.
+ \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day = ’evening $\lor$ night’.
+ \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day != ’evening $\lor$ night’ $\land$ someone enters the room.
 \end{description}
 
 \subsection{Effectors}
