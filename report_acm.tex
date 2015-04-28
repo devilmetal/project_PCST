@@ -250,9 +250,14 @@ If $S$ is the set of sensors used then the state is infered by the following equ
     </CONTENT/>
   </MESSAGE> 
 \end{verbatim}
-If a car with a RFID tag approches the RFID reader then the presence field turn to "true". If the tag is authorized then the car field turn to "allowed".
+If a car with a RFID tag approaches the RFID reader then the presence field turn to "true". If the tag is authorized then the car field turn to "allowed".
  \item[What is the actual consumption of the whole building ?]\hfill \\
- May be used to display to the webinterface.
+ This context might be inferred by using the three following sensors, the energy consumption sensor which measure the electric consumption. 
+ And the water consumption and temperature sensors that measure the current state of the water status of the house.
+ Those sensors can be used to infer two subcontexts that are the current status and the overall status.
+ The current status display the consumption of the building or the apartment in real time.
+ The second status can be computed by aggregating the sensors value and store them into a small database.
+ The user can then access those values over the web interface provided by the central unit.
 \end{description}
 \textbf{[INSERT HERE WHY THOSE CONTEXTS]}\\
 As this list is now fully established we have to on which sensors to use to analyse the context wanted.
