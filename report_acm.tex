@@ -224,20 +224,20 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
  \item[The actual weather state inside and outside]\hfill \\
  (temperature, lightning and precipitations). 
  This context depends on many different sensors input and merging.
- The first subcontext to determine how the temperature state outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
- Those terms are based on a user-determined threshold.
+ The first subcontext to determine how the temperature state is outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
+ Those terms are based on a user-determined threshold. This threshold can be set by the user via the wbe interface of the Central Unit.
  Each subcontext can be infered by using data provided on the Internet or by using outside temperature sensors.
- If $S$ is the set of sensors used outside or inside then the temperature is determined by the following equation.s
+ If $S$ is the set of sensors used outside or inside then the temperature is determined by the following equations:
  \begin{description}
   \item[hot|comfort|cold] \textbf{if} $\frac{\underset{s \in S}{\sum} s_{value}}{|S|} \in [min_{value},max_{value}]$
  \end{description}
- The precipitations state (\textbf{"rainy" or "dry"}) be infered by using values retrived over the Internet.
+ The precipitations states (\textbf{"rainy" or "dry"}) can be infered by using values retrived over the Internet.
   \item[Which is the part of the day ?] \hfill \\
   The actual date and time is enough to infer such an information.
   The part of the day can be \textbf{"morning", "noon", "afternoon", "evening" or "night"}
  \item[Is a car waiting at the garage doors ?] \hfill \\
  If an authorized car approches the RFID reader then the door can be opened.
- The message send by the RFID reader have the following form.
+ The message sent by the RFID reader has the following form:
   \begin{verbatim}
   POST central_unit 
   <MESSAGE>
@@ -251,8 +251,8 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
 \end{verbatim}
 If a car with a RFID tag approaches the RFID reader then the presence field turn to "true". If the tag is authorized then the car field turn to "allowed".
  \item[What is the actual consumption of the whole building ?]\hfill \\
- This context might be inferred by using the three following sensors, the energy consumption sensor which measure the electric consumption. 
- And the water consumption and temperature sensors that measure the current state of the water status of the house.
+ This context might be inferred by using the three following sensors, the energy consumption sensor which measures the electric consumption. 
+ The water consumption and temperature sensors that measure the current state of the water status of the house.
  Those sensors can be used to infer two subcontexts that are the current status and the overall status.
  The current status display the consumption of the building or the apartment in real time.
  The second status can be computed by aggregating the sensors value and store them into a small database.
@@ -260,7 +260,7 @@ If a car with a RFID tag approaches the RFID reader then the presence field turn
 \end{description}
 We choose those six contexts because they cover many facets of the central unit (web interface, data aggregation or even WEB information retrival).
 \subsection{Actuators}
-Admit now that each context has been computer by using the sensor data.
+Admit now that each context has been computed by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
 This can be done via listening all the possibilities.
 \begin{description}
