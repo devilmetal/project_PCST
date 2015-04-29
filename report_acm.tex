@@ -289,15 +289,44 @@ POST door_actuator
  \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day != ’evening $\lor$ night’ $\land$ someone enters the room.
 \end{description}
 
-Some cases need to be specified to understand how the actuators works
-%shema for doors/sunblinds
-%schema for lights, schema 0 and schema 3
-%======================================
-%how to activate actuators
-%TODO: COMPLETE THIS PART 
-  %messages
-  %
-%======================================
+Some cases need to be specified to understand how the actuators actually works because they might lead to conflicts.
+This is specially the case for lighting actuators. 
+We are going to specify here two types of lightning actuators and the doors actuators.
+The first type of lightning switch is called "schema 0" and it the most simple case of switch possible.
+Its structure is shown by figure~\ref{schema0}.
+In that case it is possible to let the actual wire structe as it is and only remplace the switch by our smart switch.
+
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{schema0}
+    				\caption{Schema 0 \label{schema0}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+A problem occurs when dealing with more complex wired structures. We here only discuss of the "shema 3" type that allows to control one single light
+with two switches. Its structure is shown by figure~\ref{schema3}.
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{schema3}
+    				\caption{Schema 3 \label{schema3}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Here the problem is that the structure is now composed of multiple wire.
+But we can trick this situation by allowing each light actuator unit to send a message to the other units that compose also the same lightning structure.
+Each time a switch is ordered to be turned "on" or "off" it relays the same message to all the others concerned light actuators.
+We can then remove wires and keep only one direct link between all switches as shown by figure~\ref{new_schema3}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{new_schema3}
+    				\caption{Smart schema 3 \label{new_schema3}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 \subsection{Web-based manual controller}
 %for mobile + desktop + over Internet

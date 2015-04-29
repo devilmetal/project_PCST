@@ -93,12 +93,14 @@ This means that theoretically preprocessing of sensors data is not needed but fo
 Each sensor is connected to a light computer, typically a Raspberry Pi could work but we can imagine an even less powerful one for small tasks. 
 This light computer will preprocess the raw sensor data and play the role of the interface between the sensor and the Central Unit. 
 This interface is needed in case of multiple types of sensors. By changing the sensors, one could simply apply a patch to the small computer (even via the Central Unit) and resolve compatibility issues. 
-This interface used here is a simple HTTP based communication via POST with a specific XML-based body very similar to the SOAP protocol:
+This interface used is a simple HTTP based communication via POST with a specific XML-based body very similar to the SOAP protocol. 
+This produce a simple Service-Oriented Architecture (SOA) to access the data. 
+Here is an example:
 \begin{verbatim}
 POST address 
   <MESSAGE>
     <TYPE>(alert|event|failure|do)</TYPE>
-    <FROM>(sensor_id|central)</FROM>
+    <FROM>(sensor_id|central_unit)</FROM>
     <CONTENT/>
   </MESSAGE>
 \end{verbatim}
@@ -118,7 +120,7 @@ A typical message sent by the Central Unit to open a door would be:
 POST address_of_door_actuator
   <MESSAGE>
     <TYPE>do</TYPE>
-    <FROM>central</FROM>
+    <FROM>central_unit</FROM>
     <CONTENT>door[0]:'open'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
@@ -155,7 +157,6 @@ The sensors fusion is performed to produce a context. A context is the actual st
 In this report we need to know exactly which kind of contexts we are going to consider to know exactly which sensor data has to be aggregated to produce the actual state of a room for example. 
 The aggregation itself will be done in such a way that sensors failure could be minimized.
 A standard way to do this can be done via computing a mean value of the last dozen of incoming values and use this mean as the incoming sensors value.
-Here are the contexts we are going to considered.
 \subsubsection{Sensors message synchronization}
 Has some sensors output can be asynchronous, e.g. if we take the presence sensor it could output each time it detect a presence.
 This could be solve by using some kind of synchronization protocol similar to the WiFi communication protocol.
@@ -169,7 +170,7 @@ Such a message would look like the following.
 POST address_of_sensor 
   <MESSAGE>
     <TYPE>event</TYPE>
-    <FROM>central</FROM>
+    <FROM>central_unit</FROM>
     <CONTENT>'RTS'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
@@ -250,29 +251,113 @@ We choose those six contexts because they cover many facets of the central unit 
 \subsection{Actuators}
 Admit now that each context has been computer by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
-This can be done via listening all the possibilities.
+This can be done via listening all the possibilities and the messages sent by the central unit to the actuators.
+Here we only gives a few examples for the messages as their are very similar.
 \begin{description}
- \item[Do] activate lightning \textbf{if} somebody enters the room $\land$ the room is dark.
+ \item[Do] activate lightning \textbf{if} somebody enters the room $\land$ the room is dark.\\
+ \begin{verbatim}
+  POST light_switch_id 
+  <MESSAGE>
+    <TYPE>do</TYPE>
+    <FROM>central_unit</FROM>
+    <CONTENT>light:'on'</CONTENT/>
+  </MESSAGE> 
+\end{verbatim}
  \item[Do] deactivate lightning \textbf{if} the room becomes empty $\land$ the room is lightened.
- \item[Do] reduce heating \textbf{if} room is usually empty for a quite long period $\land$ nobody is inside.
+ \item[Do] reduce heating \textbf{if} room is usually empty for a quite long period $\land$ nobody is inside.\\
+ \begin{verbatim}
+  POST thermostat 
+  <MESSAGE>
+    <TYPE>do</TYPE>
+    <FROM>central_unit</FROM>
+    <CONTENT>set_temp:'value'</CONTENT/>
+  </MESSAGE> 
+\end{verbatim}
  \item[Do] reduce heating \textbf{if} outside temperature > comfort temperature $\pm$ threshold
  \item[Do] augment heating \textbf{if} temperature < comfort temperature $\pm$ threshold.
  \item[Do] open doors \textbf{if} car is at the parking doors $\land$ door closed.
- \item[Do] close the doors \textbf{if} timer for doors is over $\land$ no car at the parking doors.
+ \item[Do] close the doors \textbf{if} timer for doors is over $\land$ no car at the parking doors.\\
+ \begin{verbatim}
+POST door_actuator
+  <MESSAGE>
+    <TYPE>do</TYPE>
+    <FROM>central_unit</FROM>
+    <CONTENT>door[0]:'open'</CONTENT/>
+  </MESSAGE> 
+\end{verbatim}
  \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day = ’evening $\lor$ night’.
  \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day != ’evening $\lor$ night’ $\land$ someone enters the room.
 \end{description}
+
+Some cases need to be specified to understand how the actuators actually works because they might lead to conflicts.
+This is specially the case for lighting actuators. 
+We are going to specify here two types of lightning actuators and the doors actuators.
+The first type of lightning switch is called "schema 0" and it the most simple case of switch possible.
+Its structure is shown by figure~\ref{schema0}.
+In that case it is possible to let the actual wire structe as it is and only remplace the switch by our smart switch.
+
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{schema0}
+    				\caption{Schema 0 \label{schema0}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+A problem occurs when dealing with more complex wiring structures. We here only discuss of the "shema 3" type that allows to control one single light
+with two switches. Its structure is shown by figure~\ref{schema3}.
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{schema3}
+    				\caption{Schema 3 \label{schema3}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Here the problem is that the structure is now composed of multiple wire.
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{new_schema3}
+    				\caption{Smart schema 3 \label{new_schema3}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+%shema for doors/sunblinds
+%schema for lights, schema 0 and schema 3
+%======================================
+%how to activate actuators
+%TODO: COMPLETE THIS PART 
+  %messages
+  %
+%======================================
+
 \subsection{Web-based manual controller}
+%for mobile + desktop + over Internet
 We think that our system must have an interface in order to offer a manual management of it.
 As the transmission of the data sensor is based on the standard HTTP protocol we can deduce that the network also support web-based application.
+Providing a web-based interface can be useful because with nowadays technologies we can provide with adapting template the same website for mobile and desktop devices.
+This precision is important because smartphones are widely used they can be used to access the central unit more easily.
+Furthermore using a web-based application with a good authentication protocol, such as HTTPS, can make the interface available over the Internet.
+The users can thus control their homes at work or switching off the lights forgotten in the morning.
 
-for mobile + desktop + over Internet
-stats presentations
-failure presentations
-notifications (SMS, e-mail, Facebook, invasive smartphone application)
-	what must be stopped
-	what must be switched on/off automatically
-	crash of computer (?) : keep some switches ?
+%interface used for conrol (lights)
+
+%stats presentations
+
+%failure handling
+
+%	failure presentations
+
+%	what must be stopped
+
+%	what must be switched on/off automatically
+
+%	crash of computer (?) : keep some switches ?
+
+%notifications (SMS, e-mail, Facebook, invasive smartphone application)
 
 
 
