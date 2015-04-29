@@ -100,7 +100,7 @@ Here is an example:
 POST address 
   <MESSAGE>
     <TYPE>(alert|event|failure|do|synch)</TYPE>
-    <FROM>(sensor_id|central)</FROM>
+    <FROM>(sensor_id|central_unit)</FROM>
     <CONTENT/>
   </MESSAGE>
 \end{verbatim}
@@ -120,7 +120,7 @@ A typical message sent by the Central Unit to open a door would be:
 POST address_of_door_actuator
   <MESSAGE>
     <TYPE>do</TYPE>
-    <FROM>central</FROM>
+    <FROM>central_unit</FROM>
     <CONTENT>door[0]:'open'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
@@ -170,7 +170,7 @@ Such a message would look like the following.
 POST address_of_sensor 
   <MESSAGE>
     <TYPE>synch</TYPE>
-    <FROM>central</FROM>
+    <FROM>central_unit</FROM>
     <CONTENT>RTS</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
@@ -191,12 +191,10 @@ e.g. the lightning state of a room may depend on the outside lightning, the stat
   \item[natural lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "lighted" $\land$ sunblinds == "open".
   \item[artificially lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "dark".
  \end{description}
- 
- %Is the room dark or enlighted ? Does the lights are activated ? This information can
- %be infered by using the inside and outside lightning sensors, sunblinds status and the lights status.
  \item[The occupation of the room]\hfill \\ 
- In order to determine if the actual occupation of the room (\textbf{"empty" or "occupied"}) we need to merge the inputs of the presence sensors of the room.
+ In order to determine the actual occupation of the room (\textbf{"empty" or "occupied"}), we need to merge the inputs of the presence sensors of the room.
  Each presence sensor can determine if something moves around it.
+ This is a typical event message that will be sent to the Central Unit:
  \begin{verbatim}
 POST central_unit 
   <MESSAGE>
@@ -205,11 +203,11 @@ POST central_unit
     <CONTENT>presence:('true'|'false')</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
-Those sensors inputs are merge to produce a single state of the room.
-If $S$ is the set of sensors used then the state is infered by the following equations.
+Those sensors inputs are merged to produce a single state of the room.
+If $S$ is the set of sensors used, then the state is infered by the following equations:
  \begin{description}
-  \item[occupied] \textbf{if} $\underset{s \in S}{\lor} s_{state} =  True$
-  \item[empty] \textbf{if} $\underset{s \in S}{\lor} s_{state} =  False$
+  \item[occupied] \textbf{if} $\underset{s \in S}{\lor} s_{state} ==  True$
+  \item[empty] \textbf{if} $\underset{s \in S}{\lor} s_{state} ==  False$
  \end{description}
  \item[The actual weather state inside and outside]\hfill \\
  (temperature, lightning and precipitations). 
