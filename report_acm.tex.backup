@@ -305,7 +305,7 @@ In that case it is possible to let the actual wire structe as it is and only rem
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-A problem occurs when dealing with more complex wiring structures. We here only discuss of the "shema 3" type that allows to control one single light
+A problem occurs when dealing with more complex wired structures. We here only discuss of the "shema 3" type that allows to control one single light
 with two switches. Its structure is shown by figure~\ref{schema3}.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
@@ -316,6 +316,9 @@ with two switches. Its structure is shown by figure~\ref{schema3}.
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Here the problem is that the structure is now composed of multiple wire.
+But we can trick this situation by allowing each light actuator unit to send a message to the other units that compose also the same lightning structure.
+Each time a switch is ordered to be turned "on" or "off" it relays the same message to all the others concerned light actuators.
+We can then remove wires and keep only one direct link between all switches as shown by figure~\ref{new_schema3}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -325,15 +328,6 @@ Here the problem is that the structure is now composed of multiple wire.
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-%shema for doors/sunblinds
-%schema for lights, schema 0 and schema 3
-%======================================
-%how to activate actuators
-%TODO: COMPLETE THIS PART 
-  %messages
-  %
-%======================================
-
 \subsection{Web-based manual controller}
 %for mobile + desktop + over Internet
 We think that our system must have an interface in order to offer a manual management of it.
@@ -342,11 +336,11 @@ Providing a web-based interface can be useful because with nowadays technologies
 This precision is important because smartphones are widely used they can be used to access the central unit more easily.
 Furthermore using a web-based application with a good authentication protocol, such as HTTPS, can make the interface available over the Internet.
 The users can thus control their homes at work or switching off the lights forgotten in the morning.
-
 %interface used for conrol (lights)
-
+As suggested this interface should be used to also control the automation of the building.
+The user should be able to enter his preferences as a comfort temperature or to directly control the activation of the lights.
 %stats presentations
-
+The interface must also display informations that are
 %failure handling
 
 %	failure presentations
