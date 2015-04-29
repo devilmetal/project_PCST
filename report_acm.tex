@@ -88,7 +88,7 @@ In this section, we will briefly talk about the different sensors that our Centr
 We are not going into too much details as it is not our main subject for this project.
 \subsection{Sensors architecture}
 The communication between the components are achieved by WiFi or over the electrical network in case the WiFi is not reachable. 
-Communication over the electrical network can achieve a very fast connection speed between the components, up to 1200 Mbits/s [1]. % TODO: add reference from Devolo website!
+Communication over the electrical network can achieve a very fast connection speed between the components, up to 1200 Mbits/s\footnote{http://www.devolo.com/en/Products/dLAN-1200+}. 
 This means that theoretically preprocessing of sensors data is not needed but for utility reasons we will preprocess the data before reaching the Central Unit.
 Each sensor is connected to a light computer, typically a Raspberry Pi could work but we can imagine an even less powerful one for small tasks. 
 This light computer will preprocess the raw sensor data and play the role of the interface between the sensor and the Central Unit. 
