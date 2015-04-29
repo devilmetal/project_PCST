@@ -99,7 +99,7 @@ Here is an example:
 \begin{verbatim}
 POST address 
   <MESSAGE>
-    <TYPE>(alert|event|failure|do)</TYPE>
+    <TYPE>(alert|event|failure|do|synch)</TYPE>
     <FROM>(sensor_id|central)</FROM>
     <CONTENT/>
   </MESSAGE>
@@ -159,28 +159,27 @@ The aggregation itself will be done in such a way that sensors failure could be 
 A standard way to do this can be done via computing a mean value of the last dozen of incoming values and use this mean as the incoming sensors value.
 Here are the contexts we are going to considered.
 \subsubsection{Sensors message synchronization}
-Has some sensors output can be asynchronous, e.g. if we take the presence sensor it could output each time it detect a presence.
-This could be solve by using some kind of synchronization protocol similar to the WiFi communication protocol.
-Each sensor we have is connected to a little computer used for preprocessing of sensor inputs, this allow us to synchronize the data flow by offering time windows management.
-This kind of management is usually done by either give a time frame by sensor or allow one big time frame to allow each sensor to send periodically during a certain amount of time.
+As some sensors output can be asynchronous, e.g. if we take the presence sensor it could output each time it detects a presence, we need to introduce some kind of synchronization protocol similar to the WiFi communication protocol.
+Each sensor we have is connected to a little computer used for preprocessing sensor inputs, this allows us to synchronize the data flow by offering time windows management.
+This kind of management is usually done by either giving a time frame by sensor or allowing one big time frame to allow each sensor to send periodically during a certain amount of time.
 The second option will be taken here but we might introduce a little modification. 
-The size and the exact beginning of this time frame is not fixed but we introduce here Ready-To-Send (RTS) messages similar to Wifi collision avoidance protocol.
-Each time the Central Unit has finished to infer all the contexts it send a message to all the sensors a RTS message to notify them that they can send their data.
+The size and the exact beginning of this time frame is not fixed but we introduce here Ready-To-Send (RTS) messages similar to WiFi collision avoidance protocol.
+Each time the Central Unit has finished to infer all the contexts it sends a RTS message to all the sensors to notify them that they can send their data.
 Such a message would look like the following.
 \begin{verbatim}
 POST address_of_sensor 
   <MESSAGE>
-    <TYPE>event</TYPE>
+    <TYPE>synch</TYPE>
     <FROM>central</FROM>
-    <CONTENT>'RTS'</CONTENT/>
+    <CONTENT>RTS</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
-During the time between two RTS messages, sensors are able to aggregate their sensors value to give a mean value of them.
+During the time between two RTS messages sensors are able to aggregate their sensors value to give a mean value of them.
 As the sensors are now synchronized we need to infer contexts from their data.
 \subsubsection{Context inference}
 Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
 A certain context may depend on several subcontext or states, 
-e.g. the lightning state of a room may depend of the outsite lightning, the state of the lights of the room and the states of the sunblinds.
+e.g. the lightning state of a room may depend on the outside lightning, the state of the lights of the room and the states of the sunblinds.
 \begin{description}
  \item[The lightning state of the room]\hfill \\ 
  This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblind states \textbf{("open" or "closed")}. 
