@@ -182,13 +182,13 @@ A certain context may depend on several subcontext or states,
 e.g. the lightning state of a room may depend on the outside lightning, the state of the lights of the room and the states of the sunblinds.
 \begin{description}
  \item[The lightning state of the room]\hfill \\ 
- This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblind states \textbf{("open" or "closed")}. 
+ This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblinds states \textbf{("open" or "closed")}. 
  Of course those contexts are inferred by using multiple sensors input, e.g. multiple sunblinds implies multiple sunblinds states that will be summed. But we will not extend the description of such details.
  The lightning state of the room itself may be described as ("dark" or "natural lightned" or "artificially lightned").
  \begin{description}
-  \item[dark] \textbf{if} lightning of the room = "dark"
-  \item[natural lightned] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "lighted" $\land$ sunblinds = "open".
-  \item[artificially lightned] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "dark".
+  \item[dark] \textbf{if} lightning of the room == "dark"
+  \item[natural lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "lighted" $\land$ sunblinds == "open".
+  \item[artificially lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "dark".
  \end{description}
  
  %Is the room dark or enlighted ? Does the lights are activated ? This information can
