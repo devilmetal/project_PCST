@@ -1,6 +1,8 @@
 \documentclass{acm_proc_article-sp}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage[plain]{algorithm}
+\usepackage{algpseudocode}
 \newenvironment{Figure}
   {\par\medskip\noindent\minipage{\linewidth}}
   {\endminipage\par\medskip}
@@ -188,6 +190,16 @@ e.g. the lightning state of a room may depend on the outside lightning, the stat
  Knowing the lightning state of the room in combination with the time of the day will be useful in order to know if the lights must be turned on or off, and if the sunblinds must be opened or closed.
  \begin{description}
   \item[dark] \textbf{if} lightning of the room == "dark"
+  \begin{algorithm}
+  \begin{algorithmic}
+    \If {\textit{lightning of the room} = dark}
+      \State $state\gets$ dark
+    \Else
+      \State $state\gets$ lighted
+    \State \textbf{return} $state$
+  \EndIf
+  \end{algorithmic}
+  \end{algorithm}
   \item[natural lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "lighted" $\land$ sunblinds == "open".
   \item[artificially lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "dark".
  \end{description}
