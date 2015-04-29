@@ -93,7 +93,9 @@ This means that theoretically preprocessing of sensors data is not needed but fo
 Each sensor is connected to a light computer, typically a Raspberry Pi could work but we can imagine an even less powerful one for small tasks. 
 This light computer will preprocess the raw sensor data and play the role of the interface between the sensor and the Central Unit. 
 This interface is needed in case of multiple types of sensors. By changing the sensors, one could simply apply a patch to the small computer (even via the Central Unit) and resolve compatibility issues. 
-This interface used here is a simple HTTP based communication via POST with a specific XML-based body very similar to the SOAP protocol:
+This interface used is a simple HTTP based communication via POST with a specific XML-based body very similar to the SOAP protocol. 
+This produce a simple Service-Oriented Architecture (SOA) to access the data. 
+Here is an example:
 \begin{verbatim}
 POST address 
   <MESSAGE>
