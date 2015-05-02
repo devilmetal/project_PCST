@@ -248,17 +248,17 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
  If $S$ is the set of sensors used outside or inside then the temperature is determined by the following inference.
  \begin{algorithm}
   \begin{algorithmic}
-   \If {$\frac{\underset{s \in S}{\sum} s_{value}}{|S|} \in range_{hot}$}
-    \State $state\gets$ natural lightned
-   \ElsIf {\textit{outside lightning} = dark}
-    \State $state\gets$ artificially lightned
+  \State $temp\gets \frac{\underset{s \in S}{\sum} s_{value}}{|S|}$
+   \If {$temp \in range_{hot}$}
+    \State $state\gets$ hot
+   \ElsIf {$temp \in range_{comfort}$}
+    \State $state\gets$ comfort
+   \ElsIf {$temp \in range_{cold}$}
+    \State $state\gets$ cold
    \EndIf
   \State \textbf{return} $state$
   \end{algorithmic}
   \end{algorithm}
- \begin{description}
-  \item[hot|comfort|cold] \textbf{if} $\frac{\underset{s \in S}{\sum} s_{value}}{|S|} \in [min_{value},max_{value}]$
- \end{description}
  The precipitations states (\textbf{"rainy" or "dry"}) can be infered by using values retrived over the Internet.
   \subsubsection*{Which is the part of the day ?}
   The actual date and time is enough to infer such an information.

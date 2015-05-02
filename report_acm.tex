@@ -253,7 +253,7 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
     \State $state\gets$ hot
    \ElsIf {$temp \in range_{comfort}$}
     \State $state\gets$ comfort
-   \ElsIf {$temp \in range_{cold}$}
+   \ElsIf {$temp  \in range_{cold}$}
     \State $state\gets$ cold
    \EndIf
   \State \textbf{return} $state$
@@ -365,7 +365,8 @@ We can then remove wires and keep only one direct link between all switches as s
   				\end{center}
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+All other variants of "schema" are "schema 3" linked with special switches. This means that we can simply only keep one wire of the two wires that compose each "schema 3" and replace each switch by our smart switches.
+This will allows us to remplace every combination of lighting switch in the building.
 \subsection{Web-based manual controller}
 %for mobile + desktop + over Internet
 We think that our system must have an interface in order to offer a manual management of it.
