@@ -253,7 +253,7 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
     \State $state\gets$ hot
    \ElsIf {$temp \in range_{comfort}$}
     \State $state\gets$ comfort
-   \ElsIf {$temp \in range_{cold}$}
+   \ElsIf {$temp  \in range_{cold}$}
     \State $state\gets$ cold
    \EndIf
   \State \textbf{return} $state$
@@ -326,13 +326,16 @@ POST door_actuator
  \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day = ’evening $\lor$ night’.
  \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day != ’evening $\lor$ night’ $\land$ someone enters the room.
 \end{description}
-
-Some cases need to be specified to understand how the actuators actually works because they might lead to conflicts.
-This is specially the case for lighting actuators. 
+\subsection{Actuators architecture}
+All our actuators depends on electrical input to work. The main idea to perform remote activation of actuators depend of a single element that we will name "Smart Swith".
+A smart switch is a standard switch (on-off) button that can be activated by a simple computer and that will allow or not electricity to pass.
+  %We can found many example of those switch over the Internet.
+We then can specify each use of those switches.
 We are going to specify here two types of lightning actuators and the doors actuators.
+\subsubsection{Lightning}
 The first type of lightning switch is called "schema 0" and it the most simple case of switch possible.
 Its structure is shown by figure~\ref{schema0}.
-In that case it is possible to let the actual wire structe as it is and only remplace the switch by our smart switch.
+In that case it is possible to let the actual wire structure as it is and only replace the switch by our smart switch.
 
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
@@ -365,6 +368,18 @@ We can then remove wires and keep only one direct link between all switches as s
   				\end{center}
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+All other variants of "schema" are "schema 3" linked with special switches. This means that we can simply only keep one wire of the two wires that compose each "schema 3" and replace each switch by our smart switches.
+This will allows us to replace every combination of lighting switch in the building.
+\subsubsection{Motored activation (doors and sunblinds)}
+A motor activation can also be controlled by a smart switch.
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{motor}
+    				\caption{Motor activation \label{motor}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 \subsection{Web-based manual controller}
 %for mobile + desktop + over Internet
@@ -386,12 +401,31 @@ The web-based controller can also be used in case of failure handling by display
 				\begin{figure}[htb]
   				\begin{center}
     				\includegraphics[width=5cm]{mockup}
-    				\caption{Web interface mockup \label{mockup}}
+    				\caption{Web interface mockup for smartphone\label{mockup}}
   				\end{center}
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \subsection{Failure handling}
-
+Failure handling is the most complex part of this system because we need to detect many thing as broken actuators, broken sensors, 
+network failures or to deal with a central unit crash.
+\subsubsection{Sensors or actuator failure}
+It is possible to detect a sensor or actuator failure. 
+%But it is genrally hard to decide by a detection if a sensors is broken of if an actuator has a failure.
+%We can take the following case as an example.
+%Admit we want to detect a sunblind failure. Then we can take as 
+\begin{description}
+ \item[Sensors] - In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
+ Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
+ \item[Actuators] - Actuators are harder to detect. %because of no return value of actuators
+\end{description}
+\begin{verbatim}
+POST address 
+  <MESSAGE>
+    <TYPE>failure</TYPE>
+    <FROM>(sensor_id|actuator_id)</FROM>
+    <CONTENT/>
+  </MESSAGE>
+\end{verbatim}
 %	what must be stopped
 
 %	what must be switched on/off automatically

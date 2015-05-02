@@ -286,7 +286,34 @@ If a car with a RFID tag approaches the RFID reader then the presence field turn
  The second status can be computed by aggregating the sensors value and store them into a small database.
  The user can then access those values over the web interface provided by the central unit.
 We choose those six contexts because they cover many facets of the central unit (web interface, data aggregation or even WEB information retrival).
-\subsection{Actuators}
+
+\subsection{Web-based manual controller}
+%for mobile + desktop + over Internet
+We think that our system must have an interface in order to offer a manual management of it.
+As the transmission of the data sensor is based on the standard HTTP protocol we can deduce that the network also support web-based application.
+Providing a web-based interface can be useful because with nowadays technologies we can provide with adapting template the same website for mobile and desktop devices.
+This precision is important because smartphones are widely used they can be used to access the central unit more easily.
+Furthermore using a web-based application with a good authentication protocol, such as HTTPS, can make the interface available over the Internet.
+The users can thus control their homes at work or switching off the lights forgotten in the morning.
+%interface used for conrol (lights)
+As suggested this interface should be used to also control the automation of the building.
+The user should be able to enter his preferences as a comfort temperature or to directly control the activation of the lights.
+%stats presentations
+The interface must also display informations that are gattered by the system or to monitor the building activity.
+Those statistics as the water or electricity consumption might be displayed to the user into understandable graphics.
+%failure presentations
+The web-based controller can also be used in case of failure handling by displaying the exact location or type of failure and allow a more efficient reparation and diagnostic.
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=5cm]{mockup}
+    				\caption{Web interface mockup for smartphone\label{mockup}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+\section{Actuators}
 Admit now that each context has been computed by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
 This can be done via listening all the possibilities and the messages sent by the central unit to the actuators.
@@ -326,13 +353,16 @@ POST door_actuator
  \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day = ’evening $\lor$ night’.
  \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day != ’evening $\lor$ night’ $\land$ someone enters the room.
 \end{description}
-
-Some cases need to be specified to understand how the actuators actually works because they might lead to conflicts.
-This is specially the case for lighting actuators. 
+\subsection{Actuators architecture}
+All our actuators depends on electrical input to work. The main idea to perform remote activation of actuators depend of a single element that we will name "Smart Swith".
+A smart switch is a standard switch (on-off) button that can be activated by a simple computer and that will allow or not electricity to pass.
+  %We can found many example of those switch over the Internet.
+We then can specify each use of those switches.
 We are going to specify here two types of lightning actuators and the doors actuators.
+\subsubsection{Lightning}
 The first type of lightning switch is called "schema 0" and it the most simple case of switch possible.
 Its structure is shown by figure~\ref{schema0}.
-In that case it is possible to let the actual wire structe as it is and only remplace the switch by our smart switch.
+In that case it is possible to let the actual wire structure as it is and only replace the switch by our smart switch.
 
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
@@ -366,33 +396,41 @@ We can then remove wires and keep only one direct link between all switches as s
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 All other variants of "schema" are "schema 3" linked with special switches. This means that we can simply only keep one wire of the two wires that compose each "schema 3" and replace each switch by our smart switches.
-This will allows us to remplace every combination of lighting switch in the building.
-\subsection{Web-based manual controller}
-%for mobile + desktop + over Internet
-We think that our system must have an interface in order to offer a manual management of it.
-As the transmission of the data sensor is based on the standard HTTP protocol we can deduce that the network also support web-based application.
-Providing a web-based interface can be useful because with nowadays technologies we can provide with adapting template the same website for mobile and desktop devices.
-This precision is important because smartphones are widely used they can be used to access the central unit more easily.
-Furthermore using a web-based application with a good authentication protocol, such as HTTPS, can make the interface available over the Internet.
-The users can thus control their homes at work or switching off the lights forgotten in the morning.
-%interface used for conrol (lights)
-As suggested this interface should be used to also control the automation of the building.
-The user should be able to enter his preferences as a comfort temperature or to directly control the activation of the lights.
-%stats presentations
-The interface must also display informations that are gattered by the system or to monitor the building activity.
-Those statistics as the water or electricity consumption might be displayed to the user into understandable graphics.
-%failure presentations
-The web-based controller can also be used in case of failure handling by displaying the exact location or type of failure and allow a more efficient reparation and diagnostic.
+This will allows us to replace every combination of lighting switch in the building.
+\subsubsection{Motored activation (doors and sunblinds)}
+A motor activation can also be controlled by a smart switch.
+A motor is composed of two input and one output. Each input control a behavior (up or down).
+This is why we can control the motors of the sunblinds and the parking doors with a single structure of smart switches illustrated in figure~\ref{motor}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
-    				\includegraphics[width=5cm]{mockup}
-    				\caption{Web interface mockup \label{mockup}}
+    				\includegraphics[width=\linewidth]{motor}
+    				\caption{Motor activation \label{motor}}
   				\end{center}
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-\subsection{Failure handling}
 
+\section{Failure handling}
+Failure handling is the most complex part of this system because we need to detect many thing as broken actuators, broken sensors, 
+network failures or to deal with a central unit crash.
+\subsubsection{Sensors or actuator failure}
+It is possible to detect a sensor or actuator failure. 
+%But it is genrally hard to decide by a detection if a sensors is broken of if an actuator has a failure.
+%We can take the following case as an example.
+%Admit we want to detect a sunblind failure. Then we can take as 
+\begin{description}
+ \item[Sensors] - In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
+ Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
+ \item[Actuators] - Actuators are harder to detect. %because of no return value of actuators
+\end{description}
+\begin{verbatim}
+POST address 
+  <MESSAGE>
+    <TYPE>failure</TYPE>
+    <FROM>(sensor_id|actuator_id)</FROM>
+    <CONTENT/>
+  </MESSAGE>
+\end{verbatim}
 %	what must be stopped
 
 %	what must be switched on/off automatically
