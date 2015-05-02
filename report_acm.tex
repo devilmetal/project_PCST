@@ -184,13 +184,12 @@ e.g. the lightning state of a room may depend on the outside lightning, the stat
 \subsubsection*{The lightning state of the room}
  This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblinds states \textbf{("open" or "closed")}. 
  Of course those contexts are inferred by using multiple sensors input, e.g. multiple sunblinds implies multiple sunblinds states that will be summed. But we will not extend the description of such details.
- The lightning state of the room itself may be described as ("dark" or "natural lightned" or "artificially lightned").
- Knowing the lightning state of the room in combination with the time of the day will be useful in order to know if the lights must be turned on or off, and if the sunblinds must be opened or closed.
+ The lightning state of the room itself may be described as ("dark" or "naturally lighted" or "artificially lighted").
+ Knowing the lightning state of the room in combination with the time of the day will be useful in order to know if the lights must be turned on or off, and if the sunblinds must be opened or closed. Now we are going to consider the states \textbf{dark} and \textbf{lighted}. These two states can be determined thanks to the luminosity sensors present inside each room and a arbitrarily threshold that the user can change via the web interface of the Central Unit.
  \begin{description}
-  \item[dark] \textbf{if} lightning of the room == "dark"
   \begin{algorithm}
   \begin{algorithmic}
-    \If {\textit{lightning of the room} = dark}
+    \If {\textit{lightning of the room} $\leq$ lightning\_threshold}
       \State $state\gets$ dark
     \Else
       \State $state\gets$ lighted
@@ -198,22 +197,22 @@ e.g. the lightning state of a room may depend on the outside lightning, the stat
   \State \textbf{return} $state$
   \end{algorithmic}
   \end{algorithm}
-  
-We can also differentiate the natural and the artificial lighting by the following inference.
-  
+\end{description}
+We can then also differentiate between natural and the artificial lighting by the following inference. For this case, we are also considering the states of the lights switches known by the Central Unit:
+\begin{description}  
   \begin{algorithm}
   \begin{algorithmic}
-    \If {\textit{lightning of the room} = lighted}
-      \If {\textit{outside lightning} = lighted $\land$ \textit{sunblinds} = open}
-	\State $state\gets$ natural lightned
+    \If {\textit{lightning of the room} > lightning\_threshold}
+      \If {\textit{outside lightning} > lightning\_threshold $\land$ \textit{lights of the room} = off $\land$ \textit{sunblinds} = open}
+	\State $state\gets$ naturally lighted
       \ElsIf {\textit{outside lightning} = dark}
-	\State $state\gets$ artificially lightned
+	\State $state\gets$ artificially lighted
       \EndIf
     \EndIf
   \State \textbf{return} $state$
   \end{algorithmic}
   \end{algorithm}
- \end{description}
+\end{description}
  \subsubsection*{The occupation of the room}
  In order to determine the actual occupation of the room (\textbf{"empty" or "occupied"}), we need to merge the inputs of the presence sensors of the room.
  Each presence sensor can determine if something moves around it.
@@ -231,7 +230,7 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
  \begin{description}
  \begin{algorithm}
   \begin{algorithmic}
-    \If {$\underset{s \in S}{\lor} s_{state}$ = True}
+    \If {$\underset{s \in S}{\lor} s_{state}$ = true}
       \State $state\gets$ occupied
     \Else
       \State $state\gets$ empty
@@ -243,7 +242,7 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
  \subsubsection*{The actual weather state inside and outside}
  This context depends on many different sensors input and merging.
  The first subcontext to determine how the temperature state is outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
- Those terms are based on a user-determined threshold. This threshold can be set by the user via the wbe interface of the Central Unit.
+ Those terms are based on a user-determined threshold. This threshold can be set by the user via the web interface of the Central Unit.
  Each subcontext can be infered by using data provided on the Internet or by using outside temperature sensors.
  If $S$ is the set of sensors used outside or inside then the temperature is determined by the following inference.
  \begin{algorithm}
