@@ -181,8 +181,7 @@ As the sensors are now synchronized we need to infer contexts from their data.
 Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
 A certain context may depend on several subcontext or states, 
 e.g. the lightning state of a room may depend on the outside lightning, the state of the lights of the room and the states of the sunblinds.
-\begin{description}
- \item[The lightning state of the room]\hfill \\ 
+\subsubsection*{The lightning state of the room}
  This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblinds states \textbf{("open" or "closed")}. 
  Of course those contexts are inferred by using multiple sensors input, e.g. multiple sunblinds implies multiple sunblinds states that will be summed. But we will not extend the description of such details.
  The lightning state of the room itself may be described as ("dark" or "natural lightned" or "artificially lightned").
@@ -195,14 +194,27 @@ e.g. the lightning state of a room may depend on the outside lightning, the stat
       \State $state\gets$ dark
     \Else
       \State $state\gets$ lighted
-    \State \textbf{return} $state$
   \EndIf
+  \State \textbf{return} $state$
   \end{algorithmic}
   \end{algorithm}
-  \item[natural lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "lighted" $\land$ sunblinds == "open".
-  \item[artificially lightned] \textbf{if} lightning of the room == "lighted" $\land$ outside lightning == "dark".
+  
+We can also differentiate the natural and the artificial lighting by the following inference.
+  
+  \begin{algorithm}
+  \begin{algorithmic}
+    \If {\textit{lightning of the room} = lighted}
+      \If {\textit{outside lightning} = lighted $\land$ \textit{sunblinds} = open}
+	\State $state\gets$ natural lightned
+      \ElsIf {\textit{outside lightning} = dark}
+	\State $state\gets$ artificially lightned
+      \EndIf
+    \EndIf
+  \State \textbf{return} $state$
+  \end{algorithmic}
+  \end{algorithm}
  \end{description}
- \item[The occupation of the room]\hfill \\ 
+ \subsubsection*{The occupation of the room}
  In order to determine the actual occupation of the room (\textbf{"empty" or "occupied"}), we need to merge the inputs of the presence sensors of the room.
  Each presence sensor can determine if something moves around it.
  This is a typical event message that will be sent to the Central Unit:
@@ -217,24 +229,41 @@ POST central_unit
 Those sensors inputs are merged to produce a single state of the room.
 If $S$ is the set of sensors used, then the state is infered by the following equations:
  \begin{description}
-  \item[occupied] \textbf{if} $\underset{s \in S}{\lor} s_{state} ==  True$
-  \item[empty] \textbf{if} $\underset{s \in S}{\lor} s_{state} ==  False$
+ \begin{algorithm}
+  \begin{algorithmic}
+    \If {$\underset{s \in S}{\lor} s_{state}$ = True}
+      \State $state\gets$ occupied
+    \Else
+      \State $state\gets$ empty
+  \EndIf
+  \State \textbf{return} $state$
+  \end{algorithmic}
+  \end{algorithm}
  \end{description}
- \item[The actual weather state inside and outside]\hfill \\
- (temperature, lightning and precipitations). 
+ \subsubsection*{The actual weather state inside and outside}
  This context depends on many different sensors input and merging.
  The first subcontext to determine how the temperature state is outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
  Those terms are based on a user-determined threshold. This threshold can be set by the user via the wbe interface of the Central Unit.
  Each subcontext can be infered by using data provided on the Internet or by using outside temperature sensors.
- If $S$ is the set of sensors used outside or inside then the temperature is determined by the following equations:
- \begin{description}
-  \item[hot|comfort|cold] \textbf{if} $\frac{\underset{s \in S}{\sum} s_{value}}{|S|} \in [min_{value},max_{value}]$
- \end{description}
+ If $S$ is the set of sensors used outside or inside then the temperature is determined by the following inference.
+ \begin{algorithm}
+  \begin{algorithmic}
+  \State $temp\gets \frac{\underset{s \in S}{\sum} s_{value}}{|S|}$
+   \If {$temp \in range_{hot}$}
+    \State $state\gets$ hot
+   \ElsIf {$temp \in range_{comfort}$}
+    \State $state\gets$ comfort
+   \ElsIf {$temp \in range_{cold}$}
+    \State $state\gets$ cold
+   \EndIf
+  \State \textbf{return} $state$
+  \end{algorithmic}
+  \end{algorithm}
  The precipitations states (\textbf{"rainy" or "dry"}) can be infered by using values retrived over the Internet.
-  \item[Which is the part of the day ?] \hfill \\
+  \subsubsection*{Which is the part of the day ?}
   The actual date and time is enough to infer such an information.
   The part of the day can be \textbf{"morning", "noon", "afternoon", "evening" or "night"}
- \item[Is a car waiting at the garage doors ?] \hfill \\
+ \subsubsection*{Is a car waiting at the garage doors ?}
  If an authorized car approches the RFID reader then the door can be opened.
  The message sent by the RFID reader has the following form:
   \begin{verbatim}
@@ -249,14 +278,13 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
   </MESSAGE> 
 \end{verbatim}
 If a car with a RFID tag approaches the RFID reader then the presence field turn to "true". If the tag is authorized then the car field turn to "allowed".
- \item[What is the actual consumption of the whole building ?]\hfill \\
+ \subsubsection*{What is the actual consumption of the whole building ?}
  This context might be inferred by using the three following sensors, the energy consumption sensor which measures the electric consumption. 
  The water consumption and temperature sensors that measure the current state of the water status of the house.
  Those sensors can be used to infer two subcontexts that are the current status and the overall status.
  The current status display the consumption of the building or the apartment in real time.
  The second status can be computed by aggregating the sensors value and store them into a small database.
  The user can then access those values over the web interface provided by the central unit.
-\end{description}
 We choose those six contexts because they cover many facets of the central unit (web interface, data aggregation or even WEB information retrival).
 \subsection{Actuators}
 Admit now that each context has been computed by using the sensor data.

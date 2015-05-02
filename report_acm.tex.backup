@@ -1,6 +1,8 @@
 \documentclass{acm_proc_article-sp}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage[plain]{algorithm}
+\usepackage{algpseudocode}
 \newenvironment{Figure}
   {\par\medskip\noindent\minipage{\linewidth}}
   {\endminipage\par\medskip}
@@ -88,7 +90,7 @@ In this section, we will briefly talk about the different sensors that our Centr
 We are not going into too much details as it is not our main subject for this project.
 \subsection{Sensors architecture}
 The communication between the components are achieved by WiFi or over the electrical network in case the WiFi is not reachable. 
-Communication over the electrical network can achieve a very fast connection speed between the components, up to 1200 Mbits/s [1]. % TODO: add reference from Devolo website!
+Communication over the electrical network can achieve a very fast connection speed between the components, up to 1200 Mbits/s\footnote{http://www.devolo.com/en/Products/dLAN-1200+}. 
 This means that theoretically preprocessing of sensors data is not needed but for utility reasons we will preprocess the data before reaching the Central Unit.
 Each sensor is connected to a light computer, typically a Raspberry Pi could work but we can imagine an even less powerful one for small tasks. 
 This light computer will preprocess the raw sensor data and play the role of the interface between the sensor and the Central Unit. 
@@ -99,7 +101,7 @@ Here is an example:
 \begin{verbatim}
 POST address 
   <MESSAGE>
-    <TYPE>(alert|event|failure|do)</TYPE>
+    <TYPE>(alert|event|failure|do|synch)</TYPE>
     <FROM>(sensor_id|central_unit)</FROM>
     <CONTENT/>
   </MESSAGE>
@@ -127,9 +129,9 @@ POST address_of_door_actuator
 \subsection{Location}
 The locations of the sensors depend of the type of sensor. Here is the list of the sensors we are going to consider:
 \begin{description}
- \item[Luminosity sensor] - outside, at each frontage of the house.
+ \item[Luminosity sensor] - inside each room and outside at each frontage of the house.
  \item[Presence sensors] - around the lights and the doors.
- \item[Temperature sensors] - inside/outside.
+ \item[Temperature sensors] - one inside at the center of the apartment and another outside.
  \item[Energy consumption sensor] - after the electric meter.
  \item[Water consumption sensor] - before the water inlet.
  \item[Water temperature sensor] - after the water heater.
@@ -158,44 +160,64 @@ In this report we need to know exactly which kind of contexts we are going to co
 The aggregation itself will be done in such a way that sensors failure could be minimized.
 A standard way to do this can be done via computing a mean value of the last dozen of incoming values and use this mean as the incoming sensors value.
 \subsubsection{Sensors message synchronization}
-Has some sensors output can be asynchronous, e.g. if we take the presence sensor it could output each time it detect a presence.
-This could be solve by using some kind of synchronization protocol similar to the WiFi communication protocol.
-Each sensor we have is connected to a little computer used for preprocessing of sensor inputs, this allow us to synchronize the data flow by offering time windows management.
-This kind of management is usually done by either give a time frame by sensor or allow one big time frame to allow each sensor to send periodically during a certain amount of time.
+As some sensors output can be asynchronous, e.g. if we take the presence sensor it could output each time it detects a presence, we need to introduce some kind of synchronization protocol similar to the WiFi communication protocol.
+Each sensor we have is connected to a little computer used for preprocessing sensor inputs, this allows us to synchronize the data flow by offering time windows management.
+This kind of management is usually done by either giving a time frame by sensor or allowing one big time frame to allow each sensor to send periodically during a certain amount of time.
 The second option will be taken here but we might introduce a little modification. 
-The size and the exact beginning of this time frame is not fixed but we introduce here Ready-To-Send (RTS) messages similar to Wifi collision avoidance protocol.
-Each time the Central Unit has finished to infer all the contexts it send a message to all the sensors a RTS message to notify them that they can send their data.
+The size and the exact beginning of this time frame is not fixed but we introduce here Ready-To-Send (RTS) messages similar to WiFi collision avoidance protocol.
+Each time the Central Unit has finished to infer all the contexts it sends a RTS message to all the sensors to notify them that they can send their data.
 Such a message would look like the following.
 \begin{verbatim}
 POST address_of_sensor 
   <MESSAGE>
-    <TYPE>event</TYPE>
+    <TYPE>synch</TYPE>
     <FROM>central_unit</FROM>
-    <CONTENT>'RTS'</CONTENT/>
+    <CONTENT>RTS</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
-During the time between two RTS messages, sensors are able to aggregate their sensors value to give a mean value of them.
+During the time between two RTS messages sensors are able to aggregate their sensors value to give a mean value of them.
 As the sensors are now synchronized we need to infer contexts from their data.
 \subsubsection{Context inference}
 Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
 A certain context may depend on several subcontext or states, 
-e.g. the lightning state of a room may depend of the outsite lightning, the state of the lights of the room and the states of the sunblinds.
-\begin{description}
- \item[The lightning state of the room]\hfill \\ 
- This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblind states \textbf{("open" or "closed")}. 
+e.g. the lightning state of a room may depend on the outside lightning, the state of the lights of the room and the states of the sunblinds.
+\subsubsection*{The lightning state of the room}
+ This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblinds states \textbf{("open" or "closed")}. 
  Of course those contexts are inferred by using multiple sensors input, e.g. multiple sunblinds implies multiple sunblinds states that will be summed. But we will not extend the description of such details.
  The lightning state of the room itself may be described as ("dark" or "natural lightned" or "artificially lightned").
+ Knowing the lightning state of the room in combination with the time of the day will be useful in order to know if the lights must be turned on or off, and if the sunblinds must be opened or closed.
  \begin{description}
-  \item[dark] \textbf{if} lightning of the room = "dark"
-  \item[natural lightned] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "lighted" $\land$ sunblinds = "open".
-  \item[artificially lightned] \textbf{if} lightning of the room = "lighted" $\land$ outside lightning = "dark".
+  \item[dark] \textbf{if} lightning of the room == "dark"
+  \begin{algorithm}
+  \begin{algorithmic}
+    \If {\textit{lightning of the room} = dark}
+      \State $state\gets$ dark
+    \Else
+      \State $state\gets$ lighted
+  \EndIf
+  \State \textbf{return} $state$
+  \end{algorithmic}
+  \end{algorithm}
+  
+We can also differentiate the natural and the artificial lighting by the following inference.
+  
+  \begin{algorithm}
+  \begin{algorithmic}
+    \If {\textit{lightning of the room} = lighted}
+      \If {\textit{outside lightning} = lighted $\land$ \textit{sunblinds} = open}
+	\State $state\gets$ natural lightned
+      \ElsIf {\textit{outside lightning} = dark}
+	\State $state\gets$ artificially lightned
+      \EndIf
+    \EndIf
+  \State \textbf{return} $state$
+  \end{algorithmic}
+  \end{algorithm}
  \end{description}
- 
- %Is the room dark or enlighted ? Does the lights are activated ? This information can
- %be infered by using the inside and outside lightning sensors, sunblinds status and the lights status.
- \item[The occupation of the room]\hfill \\ 
- In order to determine if the actual occupation of the room (\textbf{"empty" or "occupied"}) we need to merge the inputs of the presence sensors of the room.
+ \subsubsection*{The occupation of the room}
+ In order to determine the actual occupation of the room (\textbf{"empty" or "occupied"}), we need to merge the inputs of the presence sensors of the room.
  Each presence sensor can determine if something moves around it.
+ This is a typical event message that will be sent to the Central Unit:
  \begin{verbatim}
 POST central_unit 
   <MESSAGE>
@@ -204,29 +226,46 @@ POST central_unit
     <CONTENT>presence:('true'|'false')</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
-Those sensors inputs are merge to produce a single state of the room.
-If $S$ is the set of sensors used then the state is infered by the following equations.
+Those sensors inputs are merged to produce a single state of the room.
+If $S$ is the set of sensors used, then the state is infered by the following equations:
  \begin{description}
-  \item[occupied] \textbf{if} $\underset{s \in S}{\lor} s_{state} =  True$
-  \item[empty] \textbf{if} $\underset{s \in S}{\lor} s_{state} =  False$
+ \begin{algorithm}
+  \begin{algorithmic}
+    \If {$\underset{s \in S}{\lor} s_{state}$ = True}
+      \State $state\gets$ occupied
+    \Else
+      \State $state\gets$ empty
+  \EndIf
+  \State \textbf{return} $state$
+  \end{algorithmic}
+  \end{algorithm}
  \end{description}
- \item[The actual weather state inside and outside]\hfill \\
- (temperature, lightning and precipitations). 
+ \subsubsection*{The actual weather state inside and outside}
  This context depends on many different sensors input and merging.
- The first subcontext to determine how the temperature state outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
- Those terms are based on a user-determined threshold.
+ The first subcontext to determine how the temperature state is outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
+ Those terms are based on a user-determined threshold. This threshold can be set by the user via the wbe interface of the Central Unit.
  Each subcontext can be infered by using data provided on the Internet or by using outside temperature sensors.
- If $S$ is the set of sensors used outside or inside then the temperature is determined by the following equation.s
+ If $S$ is the set of sensors used outside or inside then the temperature is determined by the following inference.
+ \begin{algorithm}
+  \begin{algorithmic}
+   \If {$\frac{\underset{s \in S}{\sum} s_{value}}{|S|} \in range_{hot}$}
+    \State $state\gets$ natural lightned
+   \ElsIf {\textit{outside lightning} = dark}
+    \State $state\gets$ artificially lightned
+   \EndIf
+  \State \textbf{return} $state$
+  \end{algorithmic}
+  \end{algorithm}
  \begin{description}
   \item[hot|comfort|cold] \textbf{if} $\frac{\underset{s \in S}{\sum} s_{value}}{|S|} \in [min_{value},max_{value}]$
  \end{description}
- The precipitations state (\textbf{"rainy" or "dry"}) be infered by using values retrived over the Internet.
-  \item[Which is the part of the day ?] \hfill \\
+ The precipitations states (\textbf{"rainy" or "dry"}) can be infered by using values retrived over the Internet.
+  \subsubsection*{Which is the part of the day ?}
   The actual date and time is enough to infer such an information.
   The part of the day can be \textbf{"morning", "noon", "afternoon", "evening" or "night"}
- \item[Is a car waiting at the garage doors ?] \hfill \\
+ \subsubsection*{Is a car waiting at the garage doors ?}
  If an authorized car approches the RFID reader then the door can be opened.
- The message send by the RFID reader have the following form.
+ The message sent by the RFID reader has the following form:
   \begin{verbatim}
   POST central_unit 
   <MESSAGE>
@@ -239,17 +278,16 @@ If $S$ is the set of sensors used then the state is infered by the following equ
   </MESSAGE> 
 \end{verbatim}
 If a car with a RFID tag approaches the RFID reader then the presence field turn to "true". If the tag is authorized then the car field turn to "allowed".
- \item[What is the actual consumption of the whole building ?]\hfill \\
- This context might be inferred by using the three following sensors, the energy consumption sensor which measure the electric consumption. 
- And the water consumption and temperature sensors that measure the current state of the water status of the house.
+ \subsubsection*{What is the actual consumption of the whole building ?}
+ This context might be inferred by using the three following sensors, the energy consumption sensor which measures the electric consumption. 
+ The water consumption and temperature sensors that measure the current state of the water status of the house.
  Those sensors can be used to infer two subcontexts that are the current status and the overall status.
  The current status display the consumption of the building or the apartment in real time.
  The second status can be computed by aggregating the sensors value and store them into a small database.
  The user can then access those values over the web interface provided by the central unit.
-\end{description}
 We choose those six contexts because they cover many facets of the central unit (web interface, data aggregation or even WEB information retrival).
 \subsection{Actuators}
-Admit now that each context has been computer by using the sensor data.
+Admit now that each context has been computed by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
 This can be done via listening all the possibilities and the messages sent by the central unit to the actuators.
 Here we only gives a few examples for the messages as their are very similar.
@@ -340,10 +378,19 @@ The users can thus control their homes at work or switching off the lights forgo
 As suggested this interface should be used to also control the automation of the building.
 The user should be able to enter his preferences as a comfort temperature or to directly control the activation of the lights.
 %stats presentations
-The interface must also display informations that are
-%failure handling
-
-%	failure presentations
+The interface must also display informations that are gattered by the system or to monitor the building activity.
+Those statistics as the water or electricity consumption might be displayed to the user into understandable graphics.
+%failure presentations
+The web-based controller can also be used in case of failure handling by displaying the exact location or type of failure and allow a more efficient reparation and diagnostic.
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=5cm]{mockup}
+    				\caption{Web interface mockup \label{mockup}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\subsection{Failure handling}
 
 %	what must be stopped
 
