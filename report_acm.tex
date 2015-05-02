@@ -85,7 +85,7 @@ The lights can also be automated by detecting the presence of people in a room.
 RFID tags linked with cars could be used to open the parking space doors.
 Of course, these automated behaviors can be stopped by the user if he doesn't want it to be performed. 
 To do so, the user can access the central unit via a web interface and change the behavior the way he want at all times.
-\section{A few words about the sensors}
+\section{Sensors}
 In this section, we will briefly talk about the different sensors that our Central Unit will deal with. 
 We are not going into too much details as it is not our main subject for this project.
 \subsection{Sensors architecture}
@@ -413,16 +413,16 @@ This is why we can control the motors of the sunblinds and the parking doors wit
 \section{Failure handling}
 Failure handling is the most complex part of this system because we need to detect many thing as broken actuators, broken sensors, 
 network failures or to deal with a central unit crash.
-\subsubsection{Sensors or actuator failure}
+\subsection{Sensors or actuator failure}
 It is possible to detect a sensor or actuator failure. 
 %But it is genrally hard to decide by a detection if a sensors is broken of if an actuator has a failure.
 %We can take the following case as an example.
 %Admit we want to detect a sunblind failure. Then we can take as 
-\begin{description}
- \item[Sensors] - In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
- Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
- \item[Actuators] - Actuators are harder to detect. %because of no return value of actuators
-\end{description}
+\subsubsection{Sensors}
+In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
+Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
+\subsubsection{Actuators} 
+Actuators are harder to detect. %because of no return value of actuators
 \begin{verbatim}
 POST address 
   <MESSAGE>
