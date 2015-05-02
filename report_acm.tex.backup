@@ -85,7 +85,7 @@ The lights can also be automated by detecting the presence of people in a room.
 RFID tags linked with cars could be used to open the parking space doors.
 Of course, these automated behaviors can be stopped by the user if he doesn't want it to be performed. 
 To do so, the user can access the central unit via a web interface and change the behavior the way he want at all times.
-\section{A few words about the sensors}
+\section{Sensors}
 In this section, we will briefly talk about the different sensors that our Central Unit will deal with. 
 We are not going into too much details as it is not our main subject for this project.
 \subsection{Sensors architecture}
@@ -286,7 +286,34 @@ If a car with a RFID tag approaches the RFID reader then the presence field turn
  The second status can be computed by aggregating the sensors value and store them into a small database.
  The user can then access those values over the web interface provided by the central unit.
 We choose those six contexts because they cover many facets of the central unit (web interface, data aggregation or even WEB information retrival).
-\subsection{Actuators}
+
+\subsection{Web-based manual controller}
+%for mobile + desktop + over Internet
+We think that our system must have an interface in order to offer a manual management of it.
+As the transmission of the data sensor is based on the standard HTTP protocol we can deduce that the network also support web-based application.
+Providing a web-based interface can be useful because with nowadays technologies we can provide with adapting template the same website for mobile and desktop devices.
+This precision is important because smartphones are widely used they can be used to access the central unit more easily.
+Furthermore using a web-based application with a good authentication protocol, such as HTTPS, can make the interface available over the Internet.
+The users can thus control their homes at work or switching off the lights forgotten in the morning.
+%interface used for conrol (lights)
+As suggested this interface should be used to also control the automation of the building.
+The user should be able to enter his preferences as a comfort temperature or to directly control the activation of the lights.
+%stats presentations
+The interface must also display informations that are gattered by the system or to monitor the building activity.
+Those statistics as the water or electricity consumption might be displayed to the user into understandable graphics.
+%failure presentations
+The web-based controller can also be used in case of failure handling by displaying the exact location or type of failure and allow a more efficient reparation and diagnostic.
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=5cm]{mockup}
+    				\caption{Web interface mockup for smartphone\label{mockup}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+\section{Actuators}
 Admit now that each context has been computed by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
 This can be done via listening all the possibilities and the messages sent by the central unit to the actuators.
@@ -372,6 +399,8 @@ All other variants of "schema" are "schema 3" linked with special switches. This
 This will allows us to replace every combination of lighting switch in the building.
 \subsubsection{Motored activation (doors and sunblinds)}
 A motor activation can also be controlled by a smart switch.
+A motor is composed of two input and one output. Each input control a behavior (up or down).
+This is why we can control the motors of the sunblinds and the parking doors with a single structure of smart switches illustrated in figure~\ref{motor}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -381,43 +410,19 @@ A motor activation can also be controlled by a smart switch.
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-\subsection{Web-based manual controller}
-%for mobile + desktop + over Internet
-We think that our system must have an interface in order to offer a manual management of it.
-As the transmission of the data sensor is based on the standard HTTP protocol we can deduce that the network also support web-based application.
-Providing a web-based interface can be useful because with nowadays technologies we can provide with adapting template the same website for mobile and desktop devices.
-This precision is important because smartphones are widely used they can be used to access the central unit more easily.
-Furthermore using a web-based application with a good authentication protocol, such as HTTPS, can make the interface available over the Internet.
-The users can thus control their homes at work or switching off the lights forgotten in the morning.
-%interface used for conrol (lights)
-As suggested this interface should be used to also control the automation of the building.
-The user should be able to enter his preferences as a comfort temperature or to directly control the activation of the lights.
-%stats presentations
-The interface must also display informations that are gattered by the system or to monitor the building activity.
-Those statistics as the water or electricity consumption might be displayed to the user into understandable graphics.
-%failure presentations
-The web-based controller can also be used in case of failure handling by displaying the exact location or type of failure and allow a more efficient reparation and diagnostic.
-%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-				\begin{figure}[htb]
-  				\begin{center}
-    				\includegraphics[width=5cm]{mockup}
-    				\caption{Web interface mockup for smartphone\label{mockup}}
-  				\end{center}
-				\end{figure}
-%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-\subsection{Failure handling}
+\section{Failure handling}
 Failure handling is the most complex part of this system because we need to detect many thing as broken actuators, broken sensors, 
 network failures or to deal with a central unit crash.
-\subsubsection{Sensors or actuator failure}
+\subsection{Sensors or actuator failure}
 It is possible to detect a sensor or actuator failure. 
 %But it is genrally hard to decide by a detection if a sensors is broken of if an actuator has a failure.
 %We can take the following case as an example.
 %Admit we want to detect a sunblind failure. Then we can take as 
-\begin{description}
- \item[Sensors] - In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
- Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
- \item[Actuators] - Actuators are harder to detect. %because of no return value of actuators
-\end{description}
+\subsubsection{Sensors}
+In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
+Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
+\subsubsection{Actuators} 
+Actuators are harder to detect. %because of no return value of actuators
 \begin{verbatim}
 POST address 
   <MESSAGE>

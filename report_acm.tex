@@ -421,23 +421,27 @@ It is possible to detect a sensor or actuator failure.
 \subsubsection{Sensors}
 In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
 Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
-\subsubsection{Actuators} 
-Actuators are harder to detect. %because of no return value of actuators
+After a sensors failure detection, the sensors send a message to the central unit.
 \begin{verbatim}
 POST address 
   <MESSAGE>
     <TYPE>failure</TYPE>
-    <FROM>(sensor_id|actuator_id)</FROM>
-    <CONTENT/>
+    <FROM>sensor_id</FROM>
+    <CONTENT>failure_code</CONTENT>
   </MESSAGE>
 \end{verbatim}
-%	what must be stopped
-
-%	what must be switched on/off automatically
-
-%	crash of computer (?) : keep some switches ?
-
+\subsubsection{Actuators} 
+Actuator failures are harder to detect due to the fact that no value is directly return by an actuator.
+But by inference one can easily detect some incoherence in the system.
+For example if the rooms sensors return a "dark" state for a room and a light is activated in the room. Then the light bulb might be broken.
+In that case no message is passed as the central unit itself compute this failure.
+\subsection{Smart switch failure}
+\subsection{Central Unit failure}
+This part is the most critical failure possible.
+Our central unit is the main component of our system and thus a single point of failure.
+\subsection{Failure notification}
 %notifications (SMS, e-mail, Facebook, invasive smartphone application)
+
 
 
 
