@@ -461,18 +461,34 @@ But by inference one can easily detect some incoherence in the system.
 For example if the rooms sensors return a "dark" state for a room and a light is activated in the room. Then the light bulb might be broken.
 In that case no message is passed as the central unit itself compute this failure.
 \subsection{Smart switch failure}
+The failure of a smart switch can lead to very problematic behavior such as the total incapacity of making actuators works.
+This will lead to not beeing able anymore to use the lights or to open the sunblinds.
+The mean idea here is to let the user have a control on the switches physically with a standard switch button.
+The problem still exists if the switches are part of a "shema 3" for example. The users need to activate the all the switches to be able to light a bulb on such a configuration.
+But this gives a quite acceptable solution until the switch replacement.
+
 \subsection{Central Unit failure}
 This part is the most critical failure possible.
 Our central unit is the main component of our system and thus a single point of failure.
+Allowing the user to have little physical control on the switch is a good solution to begin with.
+Another additional feature would be to add a little portable computer as a tablet at the entrance of each appartment to let the user bypass the central unit messages and to control with a specificaly designed application
+the whole appartment. 
+It could also remotly reboot the central unit if needed and control the patches installation.
+This little tablet could also display the errors of the system and allow a more easy fix of the failure.
+All user parameters could also be stored on this computer as backup.
+This would more or less give us a structure with two points of failure (the central unit and the portable device) which is much more robust.
+
 \subsection{Failure notification}
-%notifications (SMS, e-mail, Facebook, invasive smartphone application)
-
-
-
-
+An user-firendly feature would be to notify the users in case of failure. This can easily be done via the web interface itself as suggested by figure~\ref{mockup} or via other means such as SMS or email services.
 
 \section{Conclusion}
 
+% Hard to produce at the End
+% We tried to do as cheep as possible but it is clearly not possible if we want a reliable system
+% It is full extensible because of the central unit. We simply need to add more context and inference related.
+% The web interface can lead to more user-friendly features such as a Facebook look-like timeline to monitor the house activity.
+% We can make use of more machine-learning and thus make the house learn a bit about the users and their habits.
+% Machine learning could be useful in temparature management for example (lower the temp when users are usually not there).
 
 
 

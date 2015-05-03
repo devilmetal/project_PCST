@@ -184,13 +184,12 @@ e.g. the lightning state of a room may depend on the outside lightning, the stat
 \subsubsection*{The lightning state of the room}
  This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblinds states \textbf{("open" or "closed")}. 
  Of course those contexts are inferred by using multiple sensors input, e.g. multiple sunblinds implies multiple sunblinds states that will be summed. But we will not extend the description of such details.
- The lightning state of the room itself may be described as ("dark" or "natural lightned" or "artificially lightned").
- Knowing the lightning state of the room in combination with the time of the day will be useful in order to know if the lights must be turned on or off, and if the sunblinds must be opened or closed.
+ The lightning state of the room itself may be described as ("dark" or "naturally lighted" or "artificially lighted").
+ Knowing the lightning state of the room in combination with the time of the day will be useful in order to know if the lights must be turned on or off, and if the sunblinds must be opened or closed. Now we are going to consider the states \textbf{dark} and \textbf{lighted}. These two states can be determined thanks to the luminosity sensors present inside each room and a arbitrarily threshold that the user can change via the web interface of the Central Unit.
  \begin{description}
-  \item[dark] \textbf{if} lightning of the room == "dark"
   \begin{algorithm}
   \begin{algorithmic}
-    \If {\textit{lightning of the room} = dark}
+    \If {\textit{lightning of the room} $\leq$ lightning\_threshold}
       \State $state\gets$ dark
     \Else
       \State $state\gets$ lighted
@@ -198,25 +197,27 @@ e.g. the lightning state of a room may depend on the outside lightning, the stat
   \State \textbf{return} $state$
   \end{algorithmic}
   \end{algorithm}
-  
-We can also differentiate the natural and the artificial lighting by the following inference.
-  
+\end{description}
+We can then also differentiate between natural and the artificial lighting by the following inference. For this case, we are also considering the states of the lights switches known by the Central Unit:
+\begin{description}  
   \begin{algorithm}
   \begin{algorithmic}
-    \If {\textit{lightning of the room} = lighted}
-      \If {\textit{outside lightning} = lighted $\land$ \textit{sunblinds} = open}
-	\State $state\gets$ natural lightned
+    \If {\textit{lightning of the room} > lightning\_threshold}
+      \If {\textit{outside lightning} > lightning\_threshold $\land$ \textit{lights of the room} = off $\land$ \textit{sunblinds} = open}
+	\State $state\gets$ naturally lighted
       \ElsIf {\textit{outside lightning} = dark}
-	\State $state\gets$ artificially lightned
+	\State $state\gets$ artificially lighted
       \EndIf
     \EndIf
   \State \textbf{return} $state$
   \end{algorithmic}
   \end{algorithm}
- \end{description}
+\end{description}
  \subsubsection*{The occupation of the room}
  In order to determine the actual occupation of the room (\textbf{"empty" or "occupied"}), we need to merge the inputs of the presence sensors of the room.
- Each presence sensor can determine if something moves around it.
+ Each presence sensor can determine if something moves around it. 
+ So if someone enters the room the sensors will determine that the room is occupied, and once the person stays still in the room the sensors should not determine that the room is empty. 
+ To solve this the sensing should stop or be ignored by the Central Unit for a certain amount of time set by the user.
  This is a typical event message that will be sent to the Central Unit:
  \begin{verbatim}
 POST central_unit 
@@ -231,7 +232,7 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
  \begin{description}
  \begin{algorithm}
   \begin{algorithmic}
-    \If {$\underset{s \in S}{\lor} s_{state}$ = True}
+    \If {$\underset{s \in S}{\lor} s_{state}$ = true}
       \State $state\gets$ occupied
     \Else
       \State $state\gets$ empty
@@ -243,9 +244,10 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
  \subsubsection*{The actual weather state inside and outside}
  This context depends on many different sensors input and merging.
  The first subcontext to determine how the temperature state is outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
- Those terms are based on a user-determined threshold. This threshold can be set by the user via the wbe interface of the Central Unit.
+ Those terms are based on a user-determined threshold. This threshold can be set by the user via the web interface of the Central Unit.
  Each subcontext can be infered by using data provided on the Internet or by using outside temperature sensors.
  If $S$ is the set of sensors used outside or inside then the temperature is determined by the following inference.
+ \begin{description}
  \begin{algorithm}
   \begin{algorithmic}
   \State $temp\gets \frac{\underset{s \in S}{\sum} s_{value}}{|S|}$
@@ -259,8 +261,9 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
   \State \textbf{return} $state$
   \end{algorithmic}
   \end{algorithm}
- The precipitations states (\textbf{"rainy" or "dry"}) can be infered by using values retrived over the Internet.
-  \subsubsection*{Which is the part of the day ?}
+  \end{description}
+ The precipitations states (\textbf{"rainy" or "dry"}) can be infered by using values retrieved over the Internet.
+  \subsubsection*{Which part of the day is it?}
   The actual date and time is enough to infer such an information.
   The part of the day can be \textbf{"morning", "noon", "afternoon", "evening" or "night"}
  \subsubsection*{Is a car waiting at the garage doors ?}
@@ -279,30 +282,40 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
 \end{verbatim}
 If a car with a RFID tag approaches the RFID reader then the presence field turn to "true". If the tag is authorized then the car field turn to "allowed".
  \subsubsection*{What is the actual consumption of the whole building ?}
- This context might be inferred by using the three following sensors, the energy consumption sensor which measures the electric consumption. 
- The water consumption and temperature sensors that measure the current state of the water status of the house.
+ This context might be inferred by using the three following sensors, the energy consumption sensor which measures the electric consumption, 
+ the water consumption and temperature sensors that measure the current state of the water status of the house.
  Those sensors can be used to infer two subcontexts that are the current status and the overall status.
  The current status display the consumption of the building or the apartment in real time.
- The second status can be computed by aggregating the sensors value and store them into a small database.
- The user can then access those values over the web interface provided by the central unit.
-We choose those six contexts because they cover many facets of the central unit (web interface, data aggregation or even WEB information retrival).
+ The overall status can be computed by aggregating the sensors values and store them into a small database.
+ The user can then access those values over the web interface provided by the Central Unit.
+
+We choose those six contexts because they cover many facets of the Central Unit (web interface, data aggregation or even information retrival over the Internet).
 
 \subsection{Web-based manual controller}
 %for mobile + desktop + over Internet
 We think that our system must have an interface in order to offer a manual management of it.
-As the transmission of the data sensor is based on the standard HTTP protocol we can deduce that the network also support web-based application.
-Providing a web-based interface can be useful because with nowadays technologies we can provide with adapting template the same website for mobile and desktop devices.
-This precision is important because smartphones are widely used they can be used to access the central unit more easily.
+As the transmission of the data sensors is based on the standard HTTP protocol we can deduce that the network also support web-based application.
+Providing a web-based interface can be useful because with nowadays technologies we can provide the same website or web application for mobile and desktop devices with adapting templates.
+This precision is important because smartphones are widely used, and thus they can be used to access the Central Unit more easily. 
 Furthermore using a web-based application with a good authentication protocol, such as HTTPS, can make the interface available over the Internet.
-The users can thus control their homes at work or switching off the lights forgotten in the morning.
+This gives more freedom to the users, as they can control their homes at work or switching off the lights forgotten in the morning on the go.
+
 %interface used for conrol (lights)
 As suggested this interface should be used to also control the automation of the building.
-The user should be able to enter his preferences as a comfort temperature or to directly control the activation of the lights.
+For each room the user can choose to switch the lights on or off and to open or close the sunblinds.
+The user can fix the temperature he wants to maintain in the apartment and he can activate or not the detection of presence (i.e. if the user is not at home but there is a cat, it can be convenient to deactivate the detection of presence).
+As we saw earlier, the lights, sunblinds are automatically controlled by the Central Unit depending of the informations received by the sensors. But, it can be handy for the user to take over this control and changing the actual work flow of the Central Unit.
+A grid-based (4 $\times$ 5) design (i.e. iOS or Android applications screen) should allow the user to quickly choose among lights, sunblinds, temperature or detection of presence controls, then a room and finally he can stop the actual behaviour and change it. By doing so, the Central Unit will not automate the behavious of the particular material that has been changed until the user tell it by click on a button that will "reactivate" the automation.
+
 %stats presentations
-The interface must also display informations that are gattered by the system or to monitor the building activity.
+The interface must also display informations that are gattered by the system to monitor the building activity.
 Those statistics as the water or electricity consumption might be displayed to the user into understandable graphics.
+These statistics can then help the user to change the way he consumes those different resources or to detect if something is off (i.e. a water leak results in higher consumption of water).
+
 %failure presentations
-The web-based controller can also be used in case of failure handling by displaying the exact location or type of failure and allow a more efficient reparation and diagnostic.
+The web-based controller can also be used in case of failure by displaying the exact location or type of failure and allow a more efficient reparation and diagnostic.
+In our grid-based template, one element will give access to a list of failure items (most recent failure will appear first).
+The possible failures are discussed in Section \ref{failure_handling}.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -316,10 +329,20 @@ The web-based controller can also be used in case of failure handling by display
 \section{Actuators}
 Admit now that each context has been computed by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
-This can be done via listening all the possibilities and the messages sent by the central unit to the actuators.
+This can be done via listening all the possibilities and the messages sent by the Central Unit to the actuators.
 Here we only gives a few examples for the messages as their are very similar.
 \begin{description}
- \item[Do] activate lightning \textbf{if} somebody enters the room $\land$ the room is dark.\\
+% \begin{description}
+%  \begin{algorithm}
+%   \begin{algorithmic}
+%    \If {\textit{somebody enters the room}$\land$ \textit{room is dark}}
+%     \State switch lights on
+%    \EndIf
+%   \end{algorithmic}
+%   \end{algorithm}
+%   \end{description}
+% \begin{description}
+ \item[Do] activate lights \textbf{if} somebody enters the room $\land$ room is dark\\
  \begin{verbatim}
   POST light_switch_id 
   <MESSAGE>
@@ -328,8 +351,9 @@ Here we only gives a few examples for the messages as their are very similar.
     <CONTENT>light:'on'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
- \item[Do] deactivate lightning \textbf{if} the room becomes empty $\land$ the room is lightened.
+ \item[Do] deactivate lights \textbf{if} room is empty $\land$ room is lightened
  \item[Do] reduce heating \textbf{if} room is usually empty for a quite long period $\land$ nobody is inside.\\
+ The "quite long period" is a period of time that can be manually set by the user or this information can be infered by the Central Unit thanks to past data if they exist.
  \begin{verbatim}
   POST thermostat 
   <MESSAGE>
@@ -350,11 +374,12 @@ POST door_actuator
     <CONTENT>door[0]:'open'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
+% TODO: pas très logique...
  \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day = ’evening $\lor$ night’.
  \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day != ’evening $\lor$ night’ $\land$ someone enters the room.
 \end{description}
 \subsection{Actuators architecture}
-All our actuators depends on electrical input to work. The main idea to perform remote activation of actuators depend of a single element that we will name "Smart Swith".
+All our actuators depend on electrical input to work. The main idea of performing remote activation of actuators depends on a single element that we will name "Smart Switch".
 A smart switch is a standard switch (on-off) button that can be activated by a simple computer and that will allow or not electricity to pass.
   %We can found many example of those switch over the Internet.
 We then can specify each use of those switches.
@@ -410,7 +435,7 @@ This is why we can control the motors of the sunblinds and the parking doors wit
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-\section{Failure handling}
+\section{Failure handling}\label{failure_handling}
 Failure handling is the most complex part of this system because we need to detect many thing as broken actuators, broken sensors, 
 network failures or to deal with a central unit crash.
 \subsection{Sensors or actuator failure}
@@ -421,23 +446,41 @@ It is possible to detect a sensor or actuator failure.
 \subsubsection{Sensors}
 In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
 Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
-\subsubsection{Actuators} 
-Actuators are harder to detect. %because of no return value of actuators
+After a sensors failure detection, the sensors send a message to the central unit.
 \begin{verbatim}
 POST address 
   <MESSAGE>
     <TYPE>failure</TYPE>
-    <FROM>(sensor_id|actuator_id)</FROM>
-    <CONTENT/>
+    <FROM>sensor_id</FROM>
+    <CONTENT>failure_code</CONTENT>
   </MESSAGE>
 \end{verbatim}
-%	what must be stopped
+\subsubsection{Actuators} 
+Actuator failures are harder to detect due to the fact that no value is directly return by an actuator.
+But by inference one can easily detect some incoherence in the system.
+For example if the rooms sensors return a "dark" state for a room and a light is activated in the room. Then the light bulb might be broken.
+In that case no message is passed as the central unit itself compute this failure.
+\subsection{Smart switch failure}
+The failure of a smart switch can lead to very problematic behavior such as the total incapacity of making actuators works.
+This will lead to not beeing able anymore to use the lights or to open the sunblinds.
+The mean idea here is to let the user have a control on the switches physically with a standard switch button.
+The problem still exists if the switches are part of a "shema 3" for example. The users need to activate the all the switches to be able to light a bulb on such a configuration.
+But this gives a quite acceptable solution until the switch replacement.
 
-%	what must be switched on/off automatically
+\subsection{Central Unit failure}
+This part is the most critical failure possible.
+Our central unit is the main component of our system and thus a single point of failure.
+Allowing the user to have little physical control on the switch is a good solution to begin with.
+Another additional feature would be to add a little portable computer as a tablet at the entrance of each appartment to let the user bypass the central unit messages and to control with a specificaly designed application
+the whole appartment. 
+It could also remotly reboot the central unit if needed and control the patches installation.
+This little tablet could also display the errors of the system and allow a more easy fix of the failure.
+All user parameters could also be stored on this computer as backup.
+This would more or less give us a structure with two points of failure (the central unit and the portable device) which is much more robust.
 
-%	crash of computer (?) : keep some switches ?
-
+\subsection{Failure notification}
 %notifications (SMS, e-mail, Facebook, invasive smartphone application)
+
 
 
 
