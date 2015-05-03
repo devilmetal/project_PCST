@@ -374,8 +374,7 @@ POST door_actuator
     <CONTENT>door[0]:'open'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
-% TODO: pas très logique...
- \item[Do] close sunblinds \textbf{if} lightning outside < threshold $\land$ part of the day = ’evening $\lor$ night’.
+ \item[Do] close sunblinds \textbf{if} sunblinds open $\land$ lightning outside < lightning\_threshold $\land$ part of the day = ’evening $\lor$ night’.
  \item[Do] open sunblinds \textbf{if} sunblinds closed $\land$ part of the day != ’evening $\lor$ night’ $\land$ someone enters the room.
 \end{description}
 \subsection{Actuators architecture}
@@ -385,9 +384,9 @@ A smart switch is a standard switch (on-off) button that can be activated by a s
 We then can specify each use of those switches.
 We are going to specify here two types of lightning actuators and the doors actuators.
 \subsubsection{Lightning}
-The first type of lightning switch is called "schema 0" and it the most simple case of switch possible.
-Its structure is shown by figure~\ref{schema0}.
-In that case it is possible to let the actual wire structure as it is and only replace the switch by our smart switch.
+The first type of lightning switch is called "schema 0" and is the most simple case of switch possible.
+Its structure is shown in Figure \ref{schema0}.
+In that case it is possible to let the actual wire structure as it is and only replace the classical switches by our smart switches.
 
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
@@ -399,7 +398,7 @@ In that case it is possible to let the actual wire structure as it is and only r
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 A problem occurs when dealing with more complex wired structures. We here only discuss of the "shema 3" type that allows to control one single light
-with two switches. Its structure is shown by figure~\ref{schema3}.
+with two switches. Its structure is shown in Figure \ref{schema3}.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -409,9 +408,9 @@ with two switches. Its structure is shown by figure~\ref{schema3}.
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Here the problem is that the structure is now composed of multiple wire.
-But we can trick this situation by allowing each light actuator unit to send a message to the other units that compose also the same lightning structure.
+But we can solve this situation by allowing each light actuator unit to send a message to the other units that compose also the same lightning structure.
 Each time a switch is ordered to be turned "on" or "off" it relays the same message to all the others concerned light actuators.
-We can then remove wires and keep only one direct link between all switches as shown by figure~\ref{new_schema3}
+We can then remove wires and keep only one direct link between all switches as shown in Figure \ref{new_schema3}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -424,8 +423,8 @@ All other variants of "schema" are "schema 3" linked with special switches. This
 This will allows us to replace every combination of lighting switch in the building.
 \subsubsection{Motored activation (doors and sunblinds)}
 A motor activation can also be controlled by a smart switch.
-A motor is composed of two input and one output. Each input control a behavior (up or down).
-This is why we can control the motors of the sunblinds and the parking doors with a single structure of smart switches illustrated in figure~\ref{motor}
+A motor is composed of two input and one output. Each input controls a behavior (up or down).
+This is why we can control the motors of the sunblinds and the parking doors with a single structure of smart switches illustrated in Figure \ref{motor}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -436,19 +435,20 @@ This is why we can control the motors of the sunblinds and the parking doors wit
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 \section{Failure handling}\label{failure_handling}
-Failure handling is the most complex part of this system because we need to detect many thing as broken actuators, broken sensors, 
-network failures or to deal with a central unit crash.
-\subsection{Sensors or actuator failure}
-It is possible to detect a sensor or actuator failure. 
+Failure handling is the most complex part of this system because we need to detect many things like broken actuators, broken sensors, 
+network failures or to deal with a Central Unit crash.
+\subsection{Sensors or actuators failures}
+It is possible for the Central Unit to detect a sensor or actuator failure. 
+% Je pense qu'on y arrive, mais il faudra préciser que pour chaque message envoyé, il faut le reconnaître en envoyant un message ACK/SYN
 %But it is genrally hard to decide by a detection if a sensors is broken of if an actuator has a failure.
 %We can take the following case as an example.
 %Admit we want to detect a sunblind failure. Then we can take as 
 \subsubsection{Sensors}
-In general sensor failures are easy to detect because the small computer that aggregate its sensor value can detect that a sensors no more send values.
-Different sensors behavior as sensors degradation of skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
-After a sensors failure detection, the sensors send a message to the central unit.
+In general sensor failures are easy to detect because the small computer that aggregates its sensor values can detect that a sensor not sending values anymore. 
+Different sensors behaviors as sensors degradation or skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
+After a sensor failure detection, the sensors send a message to the Central Unit. %c'est pas plutôt la petite unité computationnelle qui envoie le message si le senseur est down? Il faudra aussi traiter le cas où c'est cette unité computationnelle qui est down, mais le senseur toujours ok...
 \begin{verbatim}
-POST address 
+POST central_unit 
   <MESSAGE>
     <TYPE>failure</TYPE>
     <FROM>sensor_id</FROM>
@@ -458,28 +458,28 @@ POST address
 \subsubsection{Actuators} 
 Actuator failures are harder to detect due to the fact that no value is directly return by an actuator.
 But by inference one can easily detect some incoherence in the system.
-For example if the rooms sensors return a "dark" state for a room and a light is activated in the room. Then the light bulb might be broken.
+For example if the room sensors returns a "dark" state for a room and a light is activated in the room. Then the light bulb might be broken.
 In that case no message is passed as the central unit itself compute this failure.
 \subsection{Smart switch failure}
-The failure of a smart switch can lead to very problematic behavior such as the total incapacity of making actuators works.
-This will lead to not beeing able anymore to use the lights or to open the sunblinds.
-The mean idea here is to let the user have a control on the switches physically with a standard switch button.
-The problem still exists if the switches are part of a "shema 3" for example. The users need to activate the all the switches to be able to light a bulb on such a configuration.
+The failure of a smart switch can lead to very problematic behavior such as the total incapacity of making actuators work.
+This will lead to not beeing able to use the lights anymore or to open the sunblinds anymore.
+The main idea here is to let the user have a control on the switches physically with a standard switch button.
+The problem still exists if the switches are part of a "shema 3" for example. The users need to activate all the switches to be able to light a bulb on such a configuration.
 But this gives a quite acceptable solution until the switch replacement.
 
 \subsection{Central Unit failure}
 This part is the most critical failure possible.
 Our central unit is the main component of our system and thus a single point of failure.
-Allowing the user to have little physical control on the switch is a good solution to begin with.
-Another additional feature would be to add a little portable computer as a tablet at the entrance of each appartment to let the user bypass the central unit messages and to control with a specificaly designed application
-the whole appartment. 
-It could also remotly reboot the central unit if needed and control the patches installation.
-This little tablet could also display the errors of the system and allow a more easy fix of the failure.
+Allowing the user to have little physical control on the switches is a good solution to begin with.
+Another additional feature would be to add a little portable computer as a tablet at the entrance of each appartment 
+to let the user bypass the Central Unit messages and to control the whole appartment with a specifically designed application.
+It could also remotly reboot the Central Unit if needed and control the patches installation.
+This little tablet could also display the errors of the system and allow a more easy way fix to the failure.
 All user parameters could also be stored on this computer as backup.
 This would more or less give us a structure with two points of failure (the central unit and the portable device) which is much more robust.
 
 \subsection{Failure notification}
-An user-firendly feature would be to notify the users in case of failure. This can easily be done via the web interface itself as suggested by figure~\ref{mockup} or via other means such as SMS or email services.
+An user-firendly feature would be to notify the users in case of failure. This can easily be done via the web interface itself as suggested in Figure \ref{mockup} or via other means such as SMS or email services.
 
 \section{Conclusion}
 
