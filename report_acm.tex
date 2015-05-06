@@ -103,7 +103,7 @@ Communication over the electrical network can achieve a very fast connection spe
 This means that theoretically preprocessing of sensors data is not needed but for utility reasons we will preprocess the data before reaching the Central Unit.
 Each sensor is connected to a light computer, typically a Raspberry Pi could work but we can imagine an even less powerful one for small tasks. 
 This light computer will preprocess the raw sensor data and play the role of the interface between the sensor and the Central Unit. 
-This interface is needed in case of multiple types of sensors. By changing the sensors, one could simply apply a patch to the small computer (even via the Central Unit) and resolve compatibility issues. 
+This interface is needed in case of multiple types of sensors. By changing the sensors, one could simply apply a patch to the small computer (even via the Central Unit) and resolve compatibility issues. For the rest of this report, we'll call this kind of light computer linked to sensors or actuators, a \textit{computational unit}.
 This interface used is a simple HTTP based communication via POST with a specific XML-based body very similar to the SOAP protocol. 
 This produce a simple Service-Oriented Architecture (SOA) to access the data. 
 Here is an example:
@@ -117,7 +117,7 @@ POST address
 \end{verbatim}
 Where the \texttt{TYPE} denotes an alert, an event or even a failure for example. 
 The \texttt{FROM} and \texttt{CONTENT} parts deals respectively with the author of the message and the actual meaning of the message. 
-A typical proximity sensor message would look like the following:
+A typical proximity sensor message would look like the following (it's the computational unit that will send the message, and not directly the sensor):
 \begin{verbatim}
 POST central_unit 
   <MESSAGE>
@@ -186,6 +186,12 @@ POST address_of_sensor
 \end{verbatim}
 During the time between two RTS messages sensors are able to aggregate their sensors value to give a mean value of them.
 As the sensors are now synchronized we need to infer contexts from their data.
+\subsubsection{Communication}
+We already saw how each computational unit will send data to the Central Unit. Now, we want to make sure that this communication happens smoothly. 
+When the computational unit sends a message to the Central Unit, the latter must confirmed that it receives the message, and if it's not the case, 
+the computational unit will send again the same message. 
+This statement is also true for the other way around. 
+
 \subsubsection{Context inference}
 Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
 A certain context may depend on several subcontext or states, 
