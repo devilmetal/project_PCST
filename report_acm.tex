@@ -85,7 +85,16 @@ The lights can also be automated by detecting the presence of people in a room.
 RFID tags linked with cars could be used to open the parking space doors.
 Of course, these automated behaviors can be stopped by the user if he doesn't want it to be performed. 
 To do so, the user can access the central unit via a web interface and change the behavior the way he want at all times.
-\section{Sensors}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				\begin{figure}[htb]
+  				\begin{center}
+    				\includegraphics[width=\linewidth]{architecture}
+    				\caption{System architecture \label{architecture}}
+  				\end{center}
+				\end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+\section{Sensors}\label{sensors_section}
 In this section, we will briefly talk about the different sensors that our Central Unit will deal with. 
 We are not going into too much details as it is not our main subject for this project.
 \subsection{Sensors architecture}
@@ -329,8 +338,13 @@ The possible failures are discussed in Section \ref{failure_handling}.
 \section{Actuators}
 Admit now that each context has been computed by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
-This can be done via listening all the possibilities and the messages sent by the Central Unit to the actuators.
+This is what we call \textit{'coordination'}. 
+Our entities are here the central unit, the actuators and the sensors.
+The interactions are done via the messages sent to each others and the rules are simply a list of allowed interactions.
+We can list all the possible interactions and the messages sent by the Central Unit to the actuators.
+The evolution of the system will derivate from this simple set of rules.
 Here we only gives a few examples for the messages as their are very similar.
+We can also add that after this definition of coordination the message coordination explained in section~\ref{sensors_section} can be seen as time synchronization between the entities.
 \begin{description}
 % \begin{description}
 %  \begin{algorithm}
