@@ -3,13 +3,58 @@
 \usepackage{graphicx}
 \usepackage[plain]{algorithm}
 \usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=XML,                 % the language of the code
+  otherkeywords={*,...},            % if you want to add more keywords to the set
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
 \newenvironment{Figure}
   {\par\medskip\noindent\minipage{\linewidth}}
   {\endminipage\par\medskip}
 
 \begin{document}
 \graphicspath{{figures/}}
-
 \title{“Starter kit for smart buildings”}
 \subtitle{Pervasive Computing : Selected Topics Project}
 
@@ -37,10 +82,12 @@
 % number that will appear in the \additionalauthors section.
 \maketitle
 \begin{abstract}
-The goal of this report is to describe an easy way to integrate a basic pervasive system into an already built house/building. 
-The system should be cheap and easy enough to integrate and to operate so it could be used by the masses as a starter kit for smart buildings. 
-The report will be based on the data analysis and the context of use of this system. 
-Especially about the central unit managing the whole house.
+This report presents a starter kit for converting a standard building into a smart one.
+We describe an overview of the architecture of the sensors and the actuators but the aim of the project is about the Central Unit, the main component of the system.
+The Central Unit is responsible of the contexts inference from incoming sensors values.
+It also manages the actuators activation.
+We thus describe all the inferences needed.
+We also provide a sample via some mockups and ideas of how the manual interface for the Central Unit should be designed.
 \end{abstract}
 \section{Introduction}
 \subsection{Smart building description}
@@ -73,6 +120,9 @@ Each group has its own electrical phase.
 For a standard four rooms apartment (one kitchen, three rooms and one bathroom) we would have three or four groups: one managing the kitchen, one managing the bathroom and one or two groups for the other rooms. 
 The building has a central water heater, separated electric meters per apartment and an individual thermostat per apartment. 
 A central electrical panel is available for the whole building. An indoor parking space in common with an electric door that is activated by a remote controller is also considered.
+This architecture may seems restrictive but the design of the system is extensible and allows more than one light or one sunblind per room.
+It is also possible to adapt the system and add more sensors types and actuators.
+
 \subsection{What could be automated}
 Sunblinds are opening or closing automatically by checking the sunlight and time. 
 For example if it's sunny the sunblinds will be closing. The same way, at night, they should be closing to protect our privacy.
@@ -85,6 +135,9 @@ The lights can also be automated by detecting the presence of people in a room.
 RFID tags linked with cars could be used to open the parking space doors.
 Of course, these automated behaviors can be stopped by the user if he doesn't want it to be performed. 
 To do so, the user can access the central unit via a web interface and change the behavior the way he want at all times.
+Figure \ref{architecture} shows the different compoenents of the system we want to build. This system is composed of sensors, actuators, computational units and a Central Unit. 
+As it can be seen, for each sensor and actuator, we'll have a computational unit connected to them. These computational units will be connected to the Central Unit, and will be responsible to send messages to the Central Unit. 
+These different compoenents will discussed in more detailed in the next sections.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -94,7 +147,7 @@ To do so, the user can access the central unit via a web interface and change th
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-\section{Sensors}
+\section{Sensors}\label{sensors_section}
 In this section, we will briefly talk about the different sensors that our Central Unit will deal with. 
 We are not going into too much details as it is not our main subject for this project.
 \subsection{Sensors architecture}
@@ -103,24 +156,35 @@ Communication over the electrical network can achieve a very fast connection spe
 This means that theoretically preprocessing of sensors data is not needed but for utility reasons we will preprocess the data before reaching the Central Unit.
 Each sensor is connected to a light computer, typically a Raspberry Pi could work but we can imagine an even less powerful one for small tasks. 
 This light computer will preprocess the raw sensor data and play the role of the interface between the sensor and the Central Unit. 
-This interface is needed in case of multiple types of sensors. By changing the sensors, one could simply apply a patch to the small computer (even via the Central Unit) and resolve compatibility issues. 
+This interface is needed in case of multiple types of sensors. By changing the sensors, one could simply apply a patch to the small computer (even via the Central Unit) and resolve compatibility issues. For the rest of this report, we'll call this kind of light computer linked to sensors or actuators, a \textit{computational unit}.
 This interface used is a simple HTTP based communication via POST with a specific XML-based body very similar to the SOAP protocol. 
 This produce a simple Service-Oriented Architecture (SOA) to access the data. 
 Here is an example:
+\begin{lstlisting}[style=customc]
+POST address 
+  <MESSAGE>
+    <ID>message_id</ID>
+    <TYPE>(alert|event|failure|do|synch|ack)</TYPE>
+    <FROM>(sensor_id|central_unit)</FROM>
+    <CONTENT/>
+  </MESSAGE>
+\end{lstlisting}
 \begin{verbatim}
 POST address 
   <MESSAGE>
-    <TYPE>(alert|event|failure|do|synch)</TYPE>
+    <ID>message_id</ID>
+    <TYPE>(alert|event|failure|do|synch|ack)</TYPE>
     <FROM>(sensor_id|central_unit)</FROM>
     <CONTENT/>
   </MESSAGE>
 \end{verbatim}
 Where the \texttt{TYPE} denotes an alert, an event or even a failure for example. 
 The \texttt{FROM} and \texttt{CONTENT} parts deals respectively with the author of the message and the actual meaning of the message. 
-A typical proximity sensor message would look like the following:
+A typical proximity sensor message would look like the following (it's the computational unit that will send the message, and not directly the sensor):
 \begin{verbatim}
 POST central_unit 
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>event</TYPE>
     <FROM>sensor_id2345</FROM>
     <CONTENT>distance:'2.34m'</CONTENT/>
@@ -130,11 +194,31 @@ A typical message sent by the Central Unit to open a door would be:
 \begin{verbatim}
 POST address_of_door_actuator
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>do</TYPE>
     <FROM>central_unit</FROM>
     <CONTENT>door[0]:'open'</CONTENT/>
   </MESSAGE> 
 \end{verbatim}
+
+We want to make sure that this communication behaves correctly. 
+When the computational unit sends a message to the Central Unit, the latter must confirmed that it receives the message, and if it's not the case, 
+the computational unit will send again the same message. 
+This statement is also true for the other way around. 
+Let's take the following exammple: a computational unit send the proximity sensor message shown earlier, the Central Unit will in return respond with the follwing message:
+
+\begin{verbatim}
+POST sensor_address
+  <MESSAGE>
+    <ID>message_id</ID>
+    <TYPE>ack</TYPE>
+    <FROM>central_unit</FROM>
+    <CONTENT>acked_message_id</CONTENT/>
+  </MESSAGE>
+\end{verbatim}
+
+Of course, the computational unit has to keep track of all the non-acked messages in order to send them again in the next timing window.
+
 \subsection{Location}
 The locations of the sensors depend of the type of sensor. Here is the list of the sensors we are going to consider:
 \begin{description}
@@ -163,7 +247,7 @@ The architecture itself has no specific requirement.
 We can choose whatever we want, here we might focus on a standard Linux distribution as Ubuntu without any graphical environment as the only interaction we have will be via a web interface discussed later. 
 Furthermore the computation needed is not too high as the preprocessing of the sensor is done on the sensor side with light computer as discussed earlier. 
 The computer should also be running 24/7 and thus the computer has to have a low consumption. A light computer as a Raspberry Pi might be enough.
-\subsection{Sensor fusion}
+\subsection{Sensors fusion}
 The sensors fusion is performed to produce a context. A context is the actual state of an entity such as a room or a person. 
 In this report we need to know exactly which kind of contexts we are going to consider to know exactly which sensor data has to be aggregated to produce the actual state of a room for example. 
 The aggregation itself will be done in such a way that sensors failure could be minimized.
@@ -179,6 +263,7 @@ Such a message would look like the following.
 \begin{verbatim}
 POST address_of_sensor 
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>synch</TYPE>
     <FROM>central_unit</FROM>
     <CONTENT>RTS</CONTENT/>
@@ -186,6 +271,7 @@ POST address_of_sensor
 \end{verbatim}
 During the time between two RTS messages sensors are able to aggregate their sensors value to give a mean value of them.
 As the sensors are now synchronized we need to infer contexts from their data.
+
 \subsubsection{Context inference}
 Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
 A certain context may depend on several subcontext or states, 
@@ -231,6 +317,7 @@ We can then also differentiate between natural and the artificial lighting by th
  \begin{verbatim}
 POST central_unit 
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>event</TYPE>
     <FROM>sensor_id</FROM>
     <CONTENT>presence:('true'|'false')</CONTENT/>
@@ -281,6 +368,7 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
   \begin{verbatim}
   POST central_unit 
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>event</TYPE>
     <FROM>RFID_reader</FROM>
     <CONTENT>
@@ -313,8 +401,17 @@ This gives more freedom to the users, as they can control their homes at work or
 As suggested this interface should be used to also control the automation of the building.
 For each room the user can choose to switch the lights on or off and to open or close the sunblinds.
 The user can fix the temperature he wants to maintain in the apartment and he can activate or not the detection of presence (i.e. if the user is not at home but there is a cat, it can be convenient to deactivate the detection of presence).
-As we saw earlier, the lights, sunblinds are automatically controlled by the Central Unit depending of the informations received by the sensors. But, it can be handy for the user to take over this control and changing the actual work flow of the Central Unit.
-A grid-based (4 $\times$ 5) design (i.e. iOS or Android applications screen) should allow the user to quickly choose among lights, sunblinds, temperature or detection of presence controls, then a room and finally he can stop the actual behaviour and change it. By doing so, the Central Unit will not automate the behavious of the particular material that has been changed until the user tell it by click on a button that will "reactivate" the automation.
+As we saw earlier, the lights, sunblinds and temperature are automatically controlled by the Central Unit depending of the informations received by the computational units. But, it can be handy for the user to take over this control and changing the actual work flow of the automated system.
+A grid-based (see Figure \ref{mockup2}) design should allow the user to quickly choose among lights, sunblinds or temperature controls, then a room and finally he can stop the actual behaviour and change it. By doing so, the Central Unit will not automate the behaviours of the particular material that has been changed until the user tells it by clicking on a button that will reactivate the automation.
+
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        \begin{figure}[htb]
+          \begin{center}
+            \includegraphics[width=5cm]{mockup2}
+            \caption{Home screen mockup for smartphone\label{mockup2}}
+          \end{center}
+        \end{figure}
+%++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 %stats presentations
 The interface must also display informations that are gattered by the system to monitor the building activity.
@@ -329,7 +426,7 @@ The possible failures are discussed in Section \ref{failure_handling}.
 				\begin{figure}[htb]
   				\begin{center}
     				\includegraphics[width=5cm]{mockup}
-    				\caption{Web interface mockup for smartphone\label{mockup}}
+    				\caption{Parameters screen mockup for smartphone\label{mockup}}
   				\end{center}
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -338,8 +435,13 @@ The possible failures are discussed in Section \ref{failure_handling}.
 \section{Actuators}
 Admit now that each context has been computed by using the sensor data.
 We must now describe how an actual context combined with new sensors data coming in will react. 
-This can be done via listening all the possibilities and the messages sent by the Central Unit to the actuators.
+This is what we call \textit{'coordination'}. 
+Our entities are here the central unit, the actuators and the sensors.
+The interactions are done via the messages sent to each others and the rules are simply a list of allowed interactions.
+We can list all the possible interactions and the messages sent by the Central Unit to the actuators.
+The evolution of the system will derivate from this simple set of rules.
 Here we only gives a few examples for the messages as their are very similar.
+We can also add that after this definition of coordination the message coordination explained in section~\ref{sensors_section} can be seen as time synchronization between the entities.
 \begin{description}
 % \begin{description}
 %  \begin{algorithm}
@@ -355,6 +457,7 @@ Here we only gives a few examples for the messages as their are very similar.
  \begin{verbatim}
   POST light_switch_id 
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>do</TYPE>
     <FROM>central_unit</FROM>
     <CONTENT>light:'on'</CONTENT/>
@@ -362,10 +465,11 @@ Here we only gives a few examples for the messages as their are very similar.
 \end{verbatim}
  \item[Do] deactivate lights \textbf{if} room is empty $\land$ room is lightened
  \item[Do] reduce heating \textbf{if} room is usually empty for a quite long period $\land$ nobody is inside.\\
- The "quite long period" is a period of time that can be manually set by the user or this information can be infered by the Central Unit thanks to past data if they exist.
+ The "quite long period" is a period of time that can be manually set by the user (vacancy mode) or can be infered by the Central Unit thanks to past data if they exist.
  \begin{verbatim}
   POST thermostat 
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>do</TYPE>
     <FROM>central_unit</FROM>
     <CONTENT>set_temp:'value'</CONTENT/>
@@ -378,6 +482,7 @@ Here we only gives a few examples for the messages as their are very similar.
  \begin{verbatim}
 POST door_actuator
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>do</TYPE>
     <FROM>central_unit</FROM>
     <CONTENT>door[0]:'open'</CONTENT/>
@@ -433,7 +538,7 @@ This will allows us to replace every combination of lighting switch in the build
 \subsubsection{Motored activation (doors and sunblinds)}
 A motor activation can also be controlled by a smart switch.
 A motor is composed of two input and one output. Each input controls a behavior (up or down).
-This is why we can control the motors of the sunblinds and the parking doors with a single structure of smart switches illustrated in Figure \ref{motor}
+This is why we can control the motors of the sunblinds and the parking doors with a single structure of smart switches illustrated in Figure \ref{motor}.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -447,33 +552,30 @@ This is why we can control the motors of the sunblinds and the parking doors wit
 Failure handling is the most complex part of this system because we need to detect many things like broken actuators, broken sensors, 
 network failures or to deal with a Central Unit crash.
 \subsection{Sensors or actuators failures}
-It is possible for the Central Unit to detect a sensor or actuator failure. 
-% Je pense qu'on y arrive, mais il faudra préciser que pour chaque message envoyé, il faut le reconnaître en envoyant un message ACK/SYN
-%But it is genrally hard to decide by a detection if a sensors is broken of if an actuator has a failure.
-%We can take the following case as an example.
-%Admit we want to detect a sunblind failure. Then we can take as 
 \subsubsection{Sensors}
-In general sensor failures are easy to detect because the small computer that aggregates its sensor values can detect that a sensor not sending values anymore. 
+In general sensors failures are easy to detect because the computational unit that aggregates its sensor values can detect that a sensor is not sending values anymore. 
 Different sensors behaviors as sensors degradation or skew sensors values can be detected via simple machine learning as computing mean and variance of sensor outputs and detect abnormal variations via a probabilist model.
-After a sensor failure detection, the sensors send a message to the Central Unit. %c'est pas plutôt la petite unité computationnelle qui envoie le message si le senseur est down? Il faudra aussi traiter le cas où c'est cette unité computationnelle qui est down, mais le senseur toujours ok...
+After a sensor failure detection, the computational unit sends a message to the Central Unit that looks like the following: 
 \begin{verbatim}
 POST central_unit 
   <MESSAGE>
+    <ID>message_id</ID>
     <TYPE>failure</TYPE>
     <FROM>sensor_id</FROM>
     <CONTENT>failure_code</CONTENT>
   </MESSAGE>
 \end{verbatim}
+If the computational unit itself is broken, then Central Unit will not receive messages from it anymore.
 \subsubsection{Actuators} 
-Actuator failures are harder to detect due to the fact that no value is directly return by an actuator.
-But by inference one can easily detect some incoherence in the system.
-For example if the room sensors returns a "dark" state for a room and a light is activated in the room. Then the light bulb might be broken.
+Actuators failures are harder to detect due to the fact that no value is directly return by the computational unit of an actuator.
+But by inference the Central Unit can easily detect some incoherences in the system by analyzing the different contexts before and after actuator activation.
+For example if the room computational units of the sensors returns a "dark" state for a room and for the Central Unit a "lighted" state, then the light bulb might be broken.
 In that case no message is passed as the central unit itself compute this failure.
 \subsection{Smart switch failure}
-The failure of a smart switch can lead to very problematic behavior such as the total incapacity of making actuators work.
-This will lead to not beeing able to use the lights anymore or to open the sunblinds anymore.
+The failure of a smart switch can lead to very problematic behaviors such as the total incapacity of making actuators work.
+This will lead to not beeing able to use the lights or to open the sunblinds anymore.
 The main idea here is to let the user have a control on the switches physically with a standard switch button.
-The problem still exists if the switches are part of a "shema 3" for example. The users need to activate all the switches to be able to light a bulb on such a configuration.
+The problem still exists if the switches are part of a "shema 3" for example. The users need to activate all the switches to be able to light up a bulb on such a configuration.
 But this gives a quite acceptable solution until the switch replacement.
 
 \subsection{Central Unit failure}
@@ -491,17 +593,23 @@ This would more or less give us a structure with two points of failure (the cent
 An user-firendly feature would be to notify the users in case of failure. This can easily be done via the web interface itself as suggested in Figure \ref{mockup} or via other means such as SMS or email services.
 
 \section{Conclusion}
-
-% Hard to produce at the End
-% We tried to do as cheep as possible but it is clearly not possible if we want a reliable system
-% It is full extensible because of the central unit. We simply need to add more context and inference related.
-% The web interface can lead to more user-friendly features such as a Facebook look-like timeline to monitor the house activity.
-% We can make use of more machine-learning and thus make the house learn a bit about the users and their habits.
-% Machine learning could be useful in temparature management for example (lower the temp when users are usually not there).
-
-
-
-\section{Acknowledgments}
+To conclude this report, we wanted to provide a starter kit to turn an existing building in a smart one without changing it physically too much. 
+In order to do this, several components have to be installed in the building, such as sensors, actuators, computational units and a central unit. 
+The latter is at the heart of the system as it will control the automation of the building. 
+Moreover it will provide monitoring of the house. 
+As previously developped in this report, we saw that it's not an easy task. 
+Firstly, designing a reliable system involves more compoenents that we originally thought. 
+For example, it can be handy to have computational units between the actuators (or sensors) and the Central Unit. 
+The developped system is fully extensible because of the central unit. We simply need to add more contexts and inferences related. 
+It's also possible to easily add new sensors with a computational units connected to it in the house. 
+Then a patch has to be applied to the Central Unit in order to take these new components into account. 
+We can also imagine a way to do the same via the web interface. 
+We saw that handling failures in such a system is very complex as each component can crash. 
+Moreover, in some cases, it can be difficult to detect malfunctions. 
+A workaround could be to use machine learning to detect those abnormalities, but this has high computational cost so a more powerful Central Unit has to be considered. 
+Machine learning can also be used to make the house learn a bit about the users and their habits. 
+This can be useful in temparature management, for example the system will lower the temperature when it knows that the users are usually not there. 
+Concerning the web interface, a more user-friendly feature such as a Facebook look-like timeline to monitor the house activity could allow a better user experience, as most of them are now used this kind of data presentation. 
 
 
 
