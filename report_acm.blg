@@ -3,46 +3,44 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report_acm.aux
 The style file: abbrv.bst
 Database file #1: sigproc.bib
-Warning--empty booktitle in ref1
-You've used 1 entry,
+You've used 2 entries,
             2118 wiz_defined-function locations,
-            502 strings with 3846 characters,
-and the built_in function-call counts, 255 in all, are:
-= -- 21
-> -- 7
+            506 strings with 4019 characters,
+and the built_in function-call counts, 414 in all, are:
+= -- 36
+> -- 14
 < -- 0
-+ -- 3
-- -- 2
-* -- 11
-:= -- 49
-add.period$ -- 3
-call.type$ -- 1
-change.case$ -- 4
++ -- 6
+- -- 4
+* -- 16
+:= -- 76
+add.period$ -- 5
+call.type$ -- 2
+change.case$ -- 7
 chr.to.int$ -- 0
 cite$ -- 2
-duplicate$ -- 14
-empty$ -- 27
-format.name$ -- 2
-if$ -- 52
+duplicate$ -- 16
+empty$ -- 41
+format.name$ -- 4
+if$ -- 84
 int.to.chr$ -- 0
-int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 8
-num.names$ -- 2
-pop$ -- 9
+int.to.str$ -- 2
+missing$ -- 0
+newline$ -- 12
+num.names$ -- 4
+pop$ -- 14
 preamble$ -- 1
-purify$ -- 3
+purify$ -- 6
 quote$ -- 0
-skip$ -- 6
+skip$ -- 14
 stack$ -- 0
-substring$ -- 5
-swap$ -- 0
+substring$ -- 10
+swap$ -- 3
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 4
-warning$ -- 1
-while$ -- 2
-width$ -- 2
-write$ -- 12
-(There was 1 warning)
+type$ -- 8
+warning$ -- 0
+while$ -- 4
+width$ -- 3
+write$ -- 20

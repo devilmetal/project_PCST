@@ -2,8 +2,12 @@
 
 \bibitem{ref1}
 P.~F. et~B.~ROULET.
-\newblock Electricite options construction mecanique electrotechnique et
-  electronique tome 1.
-\newblock FERNAND NATHAN, 1968.
+\newblock {\em ELECTRICITE OPTIONS CONSTRUCTION MECANIQUE ELECTROTECHNIQUE ET
+  ELECTRONIQUE TOME 1}, 1968.
+
+\bibitem{basecourse}
+D.~A. L.~M. Prof. Béat~Hirsbrunner, Prof. Pascal~Bruegger.
+\newblock Pervasive computing: Selected topics, 2015.
+\newblock Master Course, Swiss Joint Master of Science in Computer Science.
 
 \end{thebibliography}
