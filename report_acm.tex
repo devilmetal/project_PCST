@@ -73,11 +73,11 @@ We also provide a sample via some mockups and ideas of how the manual interface 
 \section{Introduction}
 \subsection{Smart building description}
 A smart building is by definition a building enhanced by the technology that is managing it. 
-Generally the technology used is splitted into four parts. 
+Generally the technology used is split into four parts. 
 First, we have the sensors that collect data and allow to have an understanding on what is going on outside or within the house. 
 The second part is the network that allows to spread the data collected by the sensors and to eventually activate the actuators if needed. 
 The third part is the managing unit that allows to gather data and infer knowledge about the environment and thus either show the data to the user or activate actuators to change the user’s environment. 
-The last part is the data visualisation that allows the user to interact with the data.
+The last part is the data visualization that allows the user to interact with the data.
 This structure follows the given standard loop of a pervasive system shown in Figure \ref{loop}.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
@@ -116,9 +116,9 @@ The lights can also be automated by detecting the presence of people in a room.
 RFID tags linked with cars could be used to open the parking space doors.
 Of course, these automated behaviors can be stopped by the user if he doesn't want it to be performed. 
 To do so, the user can access the central unit via a web interface and change the behavior the way he want at all times.
-Figure \ref{architecture} shows the different compoenents of the system we want to build. This system is composed of sensors, actuators, computational units and a Central Unit. 
+Figure \ref{architecture} shows the different components of the system we want to build. This system is composed of sensors, actuators, computational units and a Central Unit. 
 As it can be seen, for each sensor and actuator, we'll have a computational unit connected to them. These computational units will be connected to the Central Unit, and will be responsible to send messages to the Central Unit. 
-These different compoenents will discussed in more detailed in the next sections.
+These different components will discussed in more detailed in the next sections.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
   				\begin{center}
@@ -188,7 +188,7 @@ We want to make sure that this communication behaves correctly.
 When the computational unit sends a message to the Central Unit, the latter must confirmed that it receives the message, and if it's not the case, 
 the computational unit will send again the same message. 
 This statement is also true for the other way around. 
-Let's take the following exammple: a computational unit send the proximity sensor message shown earlier, the Central Unit will in return respond with the follwing message:
+Let's take the following example: a computational unit send the proximity sensor message shown earlier, the Central Unit will in return respond with the following message:
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}
@@ -261,8 +261,8 @@ POST address_of_sensor
 During the time between two RTS messages sensors are able to aggregate their sensors value to give a mean value of them.
 As the sensors are now synchronized we need to infer contexts from their data.
 \subsubsection{Context inference}
-Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts choosen and how to obtain them.
-A certain context may depend on several subcontext or states, 
+Inferring contexts depends on the states from several sensors. In this part of the report we list the contexts chosen and how to obtain them.
+A certain context may depend on several sub context or states, 
 e.g. the lightning state of a room may depend on the outside lightning, the state of the lights of the room and the states of the sunblinds.
 \subsubsection*{The lightning state of the room}
  This context is composed of distinct contexts, the lightning of the room and the outside environment \textbf{("dark" or "lighted")} and the sunblinds states \textbf{("open" or "closed")}. 
@@ -316,7 +316,7 @@ POST central_unit
 \end{minipage}
 
 Those sensors inputs are merged to produce a single state of the room.
-If $S$ is the set of sensors used, then the state is infered by the following equations:
+If $S$ is the set of sensors used, then the state is inferred by the following equations:
  \begin{description}
  \begin{algorithm}
   \begin{algorithmic}
@@ -331,9 +331,9 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
  \end{description}
  \subsubsection*{The actual weather state inside and outside}
  This context depends on many different sensors input and merging.
- The first subcontext to determine how the temperature state is outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
+ The first sub context to determine how the temperature state is outside and for each room is as (\textbf{"cold", "comfortable" or "hot"}). 
  Those terms are based on a user-determined threshold. This threshold can be set by the user via the web interface of the Central Unit.
- Each subcontext can be infered by using data provided on the Internet or by using outside temperature sensors.
+ Each sub context can be inferred by using data provided on the Internet or by using outside temperature sensors.
  If $S$ is the set of sensors used outside or inside then the temperature is determined by the following inference.
  \begin{description}
  \begin{algorithm}
@@ -350,12 +350,12 @@ If $S$ is the set of sensors used, then the state is infered by the following eq
   \end{algorithmic}
   \end{algorithm}
   \end{description}
- The precipitations states (\textbf{"rainy" or "dry"}) can be infered by using values retrieved over the Internet.
+ The precipitations states (\textbf{"rainy" or "dry"}) can be inferred by using values retrieved over the Internet.
   \subsubsection*{Which part of the day is it?}
   The actual date and time is enough to infer such an information.
   The part of the day can be \textbf{"morning", "noon", "afternoon", "evening" or "night"}
  \subsubsection*{Is a car waiting at the garage doors ?}
- If an authorized car approches the RFID reader then the door can be opened.
+ If an authorized car approaches the RFID reader then the door can be opened.
  The message sent by the RFID reader has the following form:
  
   \begin{minipage}{\linewidth}
@@ -377,12 +377,12 @@ If a car with a RFID tag approaches the RFID reader then the presence field turn
  \subsubsection*{What is the actual consumption of the whole building ?}
  This context might be inferred by using the three following sensors, the energy consumption sensor which measures the electric consumption, 
  the water consumption and temperature sensors that measure the current state of the water status of the house.
- Those sensors can be used to infer two subcontexts that are the current status and the overall status.
+ Those sensors can be used to infer two sub contexts that are the current status and the overall status.
  The current status display the consumption of the building or the apartment in real time.
  The overall status can be computed by aggregating the sensors values and store them into a small database.
  The user can then access those values over the web interface provided by the Central Unit.
 
-We choose those six contexts because they cover many facets of the Central Unit (web interface, data aggregation or even information retrival over the Internet).
+We choose those six contexts because they cover many facets of the Central Unit (web interface, data aggregation or even information retrial over the Internet).
 
 \subsection{Web-based manual controller}
 %for mobile + desktop + over Internet
@@ -410,7 +410,7 @@ A grid-based (see Figure \ref{mockup2}) design should allow the user to quickly 
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 %stats presentations
-The interface must also display informations that are gattered by the system to monitor the building activity.
+The interface must also display informations that are gartered by the system to monitor the building activity.
 Those statistics as the water or electricity consumption might be displayed to the user into understandable graphics.
 These statistics can then help the user to change the way he consumes those different resources or to detect if something is off (i.e. a water leak results in higher consumption of water).
 
@@ -519,7 +519,7 @@ In that case it is possible to let the actual wire structure as it is and only r
 				\end{figure}
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-A problem occurs when dealing with more complex wired structures. We here only discuss of the "shema 3" type that allows to control one single light
+A problem occurs when dealing with more complex wired structures. We here only discuss of the "schema 3" type that allows to control one single light
 with two switches. Its structure is shown in Figure \ref{schema3}.
 %++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				\begin{figure}[htb]
@@ -585,35 +585,35 @@ For example if the room computational units of the sensors returns a "dark" stat
 In that case no message is passed as the central unit itself compute this failure.
 \subsection{Smart switch failure}
 The failure of a smart switch can lead to very problematic behaviors such as the total incapacity of making actuators work.
-This will lead to not beeing able to use the lights or to open the sunblinds anymore.
+This will lead to not being able to use the lights or to open the sunblinds anymore.
 The main idea here is to let the user have a control on the switches physically with a standard switch button.
-The problem still exists if the switches are part of a "shema 3" for example. The users need to activate all the switches to be able to light up a bulb on such a configuration.
+The problem still exists if the switches are part of a "schema 3" for example. The users need to activate all the switches to be able to light up a bulb on such a configuration.
 But this gives a quite acceptable solution until the switch replacement.
 
 \subsection{Central Unit failure}
 This part is the most critical failure possible.
 Our central unit is the main component of our system and thus a single point of failure.
 Allowing the user to have little physical control on the switches is a good solution to begin with.
-Another additional feature would be to add a little portable computer as a tablet at the entrance of each appartment 
-to let the user bypass the Central Unit messages and to control the whole appartment with a specifically designed application.
-It could also remotly reboot the Central Unit if needed and control the patches installation.
+Another additional feature would be to add a little portable computer as a tablet at the entrance of each apartment 
+to let the user bypass the Central Unit messages and to control the whole apartment with a specifically designed application.
+It could also remotely reboot the Central Unit if needed and control the patches installation.
 This little tablet could also display the errors of the system and allow a more easy way fix to the failure.
 All user parameters could also be stored on this computer as backup.
 This would more or less give us a structure with two points of failure (the central unit and the portable device) which is much more robust.
 
 \subsection{Failure notification}
-An user-firendly feature would be to notify the users in case of failure. This can easily be done via the web interface itself as suggested in Figure \ref{mockup} or via other means such as SMS or email services.
+An user-friendly feature would be to notify the users in case of failure. This can easily be done via the web interface itself as suggested in Figure \ref{mockup} or via other means such as SMS or email services.
 
 \section{Conclusion}
 To conclude this report, we wanted to provide a starter kit to turn an existing building in a smart one without changing it physically too much. 
 In order to do this, several components have to be installed in the building, such as sensors, actuators, computational units and a central unit. 
 The latter is at the heart of the system as it will control the automation of the building. 
 Moreover it will provide monitoring of the house. 
-As previously developped in this report, we saw that it's not an easy task.
+As previously developed in this report, we saw that it's not an easy task.
 
-Firstly, designing a reliable system involves more compoenents that we originally thought. 
+Firstly, designing a reliable system involves more components that we originally thought. 
 For example, it can be handy to have computational units between the actuators (or sensors) and the Central Unit. 
-The developped system is fully extensible because of the central unit. We simply need to add more contexts and inferences related. 
+The developed system is fully extensible because of the central unit. We simply need to add more contexts and inferences related. 
 
 It's also possible to easily add new sensors with a computational units connected to it in the house. 
 Then a patch has to be applied to the Central Unit in order to take these new components into account. 
@@ -623,9 +623,9 @@ We saw that handling failures in such a system is very complex as each component
 Moreover, in some cases, it can be difficult to detect malfunctions. 
 A workaround could be to use machine learning to detect those abnormalities, but this has high computational cost so a more powerful Central Unit has to be considered. 
 Machine learning can also be used to make the house learn a bit about the users and their habits. 
-This can be useful in temparature management, for example the system will lower the temperature when it knows that the users are usually not there. 
+This can be useful in temperature management, for example the system will lower the temperature when it knows that the users are usually not there. 
 
-Concerning the web interface, a more user-friendly feature such as a Facebook look-like timeline to monitor the house activity could allow a better user experience, as most of them are now used this kind of data presentation. 
+Concerning the web interface, a more user-friendly feature such as a Facebook look-like time line to monitor the house activity could allow a better user experience, as most of them are now used this kind of data presentation. 
 
 
 
