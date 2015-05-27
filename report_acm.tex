@@ -69,6 +69,7 @@ The Central Unit is responsible of the contexts inference from incoming sensors 
 It also manages the actuators activation.
 We thus describe all the inferences needed.
 We also provide a sample via some mockups and ideas of how the manual interface for the Central Unit should be designed.
+As this system is physical, unpredictable failures may happens. This is the reason why we distinct typical cases of failures and how they may be handle.
 \end{abstract}
 \section{Introduction}
 \subsection{Smart building description}
@@ -147,7 +148,7 @@ Here is an example:
 POST address 
   <MESSAGE>
     <ID>message_id</ID>
-    <TYPE>(alert|event|failure|do|synch|ack)</TYPE>
+    <TYPE>(event|failure|do|synch|ack)</TYPE>
     <FROM>(sensor_id|central_unit)</FROM>
     <CONTENT/>
   </MESSAGE>
@@ -502,6 +503,7 @@ POST door_actuator
 \subsection{Actuators architecture}
 All our actuators depend on electrical input to work. The main idea of performing remote activation of actuators depends on a single element that we will name "Smart Switch".
 A smart switch is a standard switch (on-off) button that can be activated by a simple computer and that will allow or not electricity to pass.
+It follows the same structure as an standard actuator (computational unit followed by the actuator, here a simple switch).
   %We can found many example of those switch over the Internet.
 We then can specify each use of those switches.
 We are going to specify here two types of lightning actuators and the doors actuators.
